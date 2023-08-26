@@ -55,7 +55,6 @@ reset:
 
     rcall wdog_init
     rcall gpio_init
-    rcall test_rom            ;Never returns on failure
 
 main_loop:
     wdr                       ;Keep watchdog happy
@@ -94,23 +93,6 @@ delay_1ms:
     brne 2$
     dec r16
     brne 1$
-    ret
-
-;Test the flash ROM by using the CRCSCAN peripheral to compute the
-;CRC16 of the flash and compare it to the CRC16 stored in the last
-;two bytes of the flash.  Jumps to fatal if they do not match.
-;Destroys R16.
-test_rom:
-    ldi r16, CRCSCAN_ENABLE_bm
-    sts CRCSCAN_CTRLA, r16    ;Start CRC scan
-
-1$: lds r16, CRCSCAN_STATUS
-    sbrc r16, CRCSCAN_BUSY_bp ;Skip next if busy=0 (scan finished)
-    rjmp 1$
-
-    sbrs r16, CRCSCAN_OK_bp   ;Skip next if ok=1 (scan passed)
-    rjmp fatal
-
     ret
 
 ;End of code
