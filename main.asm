@@ -1,4 +1,4 @@
-;ATtiny214 or ATtiny414
+;ATtiny214
 ;1  VCC
 ;2  PA4 out EXTRAOUT to 4066 (0=off, 1=on)
 ;3  PA5 out SLOUT 
@@ -14,7 +14,7 @@
 ;13 PA3 out 4080LED 
 ;14 GND
 
-    ;Definitions file "tn212.def.asm" or "tn412.def.asm"
+    ;Definitions file "tn214def.asm"
     ;will be included first by the Makefile.
 
     .area code (abs)

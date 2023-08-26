@@ -1,18 +1,14 @@
 PROJECT=stevekey
-MCU=t212
+MCU=t214
 ISPFLAGS=-c atmelice_updi
 
 PROJECT_FLASH = $(PROJECT)_$(MCU)_flash
 PROJECT_FUSES = $(PROJECT)_$(MCU)_fuses
 
-ifeq ($(MCU),t212)
-# attiny212 flash 0x0000-0x07ff
+ifeq ($(MCU),t214)
+# attiny214 flash 0x0000-0x07ff
 CRC16ADDR=0x07fe
-DEFSFILE=tn212def.asm
-else ifeq ($(MCU),t412)
-# attiny412 flash 0x0000-0x0fff
-CRC16ADDR=0x0ffe
-DEFSFILE=tn412def.asm
+DEFSFILE=tn214def.asm
 else
 $(error Unrecognized MCU value)
 endif

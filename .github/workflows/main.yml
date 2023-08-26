@@ -21,15 +21,9 @@ jobs:
 
     - name: Build the firmware (Attiny212 version)
       run: |
-        make MCU=t212
-        cat stevekey_t212_flash.lst
-        cat stevekey_t212_fuses.lst
-
-    - name: Build the firmware (Attiny412 version)
-      run: |
-        make MCU=t412
-        cat stevekey_t412_flash.lst
-        cat stevekey_t412_fuses.lst
+        make MCU=t214
+        cat stevekey_t214_flash.lst
+        cat stevekey_t214_fuses.lst
 
     - name: 'Upload build artifacts'
       uses: actions/upload-artifact@v3
