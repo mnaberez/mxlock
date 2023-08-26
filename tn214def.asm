@@ -8,12 +8,12 @@
 ;* A P P L I C A T I O N   N O T E   F O R   T H E   A V R   F A M I L Y
 ;*
 ;* Number            : AVR000
-;* File Name         : tn412def.inc
-;* Title             : Register/Bit Definitions for the ATtiny412
-;* Created           : 2021-03-01 11:32
+;* File Name         : tn214def.inc
+;* Title             : Register/Bit Definitions for the ATtiny214
+;* Created           : 2021-03-01 11:29
 ;* Version           : 1.00
 ;* Support e-mail    : avr@atmel.com
-;* Target MCU        : ATtiny412
+;* Target MCU        : ATtiny214
 ;*
 ;* DESCRIPTION
 ;* When including this file in the assembly program file, all I/O register
@@ -26,11 +26,12 @@
 
 
 
+
 ; ***** SPECIFY DEVICE ***************************************************
 
-SIGNATURE_000 = 0x1E
-SIGNATURE_001 = 0x92
-SIGNATURE_002 = 0x23
+SIGNATURE_000   = 0x1E
+SIGNATURE_001   = 0x91
+SIGNATURE_002   = 0x20
 
 
 ; ***** ABSOLUTE I/O REGISTER LOCATIONS **********************************
@@ -238,6 +239,29 @@ PORTA_PIN4CTRL = 0x0414             ; Pin 4 Control
 PORTA_PIN5CTRL = 0x0415             ; Pin 5 Control
 PORTA_PIN6CTRL = 0x0416             ; Pin 6 Control
 PORTA_PIN7CTRL = 0x0417             ; Pin 7 Control
+
+;*************************************************************************
+;** PORTB - I/O Ports
+;*************************************************************************
+
+PORTB_DIR = 0x0420                  ; Data Direction
+PORTB_DIRSET = 0x0421               ; Data Direction Set
+PORTB_DIRCLR = 0x0422               ; Data Direction Clear
+PORTB_DIRTGL = 0x0423               ; Data Direction Toggle
+PORTB_OUT = 0x0424                  ; Output Value
+PORTB_OUTSET = 0x0425               ; Output Value Set
+PORTB_OUTCLR = 0x0426               ; Output Value Clear
+PORTB_OUTTGL = 0x0427               ; Output Value Toggle
+PORTB_IN = 0x0428                   ; Input Value
+PORTB_INTFLAGS = 0x0429             ; Interrupt Flags
+PORTB_PIN0CTRL = 0x0430             ; Pin 0 Control
+PORTB_PIN1CTRL = 0x0431             ; Pin 1 Control
+PORTB_PIN2CTRL = 0x0432             ; Pin 2 Control
+PORTB_PIN3CTRL = 0x0433             ; Pin 3 Control
+PORTB_PIN4CTRL = 0x0434             ; Pin 4 Control
+PORTB_PIN5CTRL = 0x0435             ; Pin 5 Control
+PORTB_PIN6CTRL = 0x0436             ; Pin 6 Control
+PORTB_PIN7CTRL = 0x0437             ; Pin 7 Control
 
 ;*************************************************************************
 ;** PORTMUX - Port Multiplexer
@@ -569,6 +593,7 @@ GPIO_base = 0x001C                  ; General Purpose IO
 LOCKBIT_base = 0x128A               ; Lockbit
 NVMCTRL_base = 0x1000               ; Non-volatile Memory Controller
 PORTA_base = 0x0400                 ; I/O Ports
+PORTB_base = 0x0420                 ; I/O Ports
 PORTMUX_base = 0x0200               ; Port Multiplexer
 RSTCTRL_base = 0x0040               ; Reset controller
 RTC_base = 0x0140                   ; Real-Time Counter
@@ -890,8 +915,8 @@ TCA_SPLIT_LCMP1_offset = 0x2A       ; Low Compare
 TCA_SPLIT_HCMP1_offset = 0x2B       ; High Compare
 TCA_SPLIT_LCMP2_offset = 0x2C       ; Low Compare
 TCA_SPLIT_HCMP2_offset = 0x2D       ; High Compare
-TCA_SINGLE_offset = 0x00            ;
-TCA_SPLIT_offset = 0x00             ;
+TCA_SINGLE_offset = 0x00            ; 
+TCA_SPLIT_offset = 0x00             ; 
 
 ;*************************************************************************
 ;** TCB - 16-bit Timer Type B
@@ -1700,7 +1725,7 @@ CLKCTRL_PDIV_48X_gc = (0x0C<<1)     ; 48X
 CLKCTRL_CSUT_1K_gc = (0x00<<4)      ; 1K cycles
 CLKCTRL_CSUT_16K_gc = (0x01<<4)     ; 16K cycles
 CLKCTRL_CSUT_32K_gc = (0x02<<4)     ; 32K cycles
-CLKCTRL_CSUT_64K_gc = (0x03<<4)     ; 64K cycles
+CLKCTRL_CSUT_64K_gc = (0x03<<4)     ; 64k cycles
 
 
 ;*************************************************************************
@@ -2840,6 +2865,8 @@ PORTMUX_LUT1_bp = 5                 ; Configurable Custom Logic LUT1 bit positio
 ; PORTMUX_CTRLB masks
 PORTMUX_SPI0_bm = 0x04              ; Port Multiplexer SPI0 bit mask
 PORTMUX_SPI0_bp = 2                 ; Port Multiplexer SPI0 bit position
+PORTMUX_TWI0_bm = 0x10              ; Port Multiplexer TWI0 bit mask
+PORTMUX_TWI0_bp = 4                 ; Port Multiplexer TWI0 bit position
 PORTMUX_USART0_bm = 0x01            ; Port Multiplexer USART0 bit mask
 PORTMUX_USART0_bp = 0               ; Port Multiplexer USART0 bit position
 
@@ -2852,6 +2879,10 @@ PORTMUX_TCA02_bm = 0x04             ; Port Multiplexer TCA0 Output 2 bit mask
 PORTMUX_TCA02_bp = 2                ; Port Multiplexer TCA0 Output 2 bit position
 PORTMUX_TCA03_bm = 0x08             ; Port Multiplexer TCA0 Output 3 bit mask
 PORTMUX_TCA03_bp = 3                ; Port Multiplexer TCA0 Output 3 bit position
+PORTMUX_TCA04_bm = 0x10             ; Port Multiplexer TCA0 Output 4 bit mask
+PORTMUX_TCA04_bp = 4                ; Port Multiplexer TCA0 Output 4 bit position
+PORTMUX_TCA05_bm = 0x20             ; Port Multiplexer TCA0 Output 5 bit mask
+PORTMUX_TCA05_bp = 5                ; Port Multiplexer TCA0 Output 5 bit position
 
 ; PORTMUX_CTRLD masks
 PORTMUX_TCB0_bm = 0x01              ; Port Multiplexer TCB bit mask
@@ -2868,6 +2899,10 @@ PORTMUX_LUT1_ALTERNATE_gc = (0x01<<5) ; Alternate pin
 ; Port Multiplexer SPI0 select
 PORTMUX_SPI0_DEFAULT_gc = (0x00<<2) ; Default pins
 PORTMUX_SPI0_ALTERNATE_gc = (0x01<<2) ; Alternate pins
+
+; Port Multiplexer TWI0 select
+PORTMUX_TWI0_DEFAULT_gc = (0x00<<4) ; Default pins
+PORTMUX_TWI0_ALTERNATE_gc = (0x01<<4) ; Alternate pins
 
 ; Port Multiplexer USART0 select
 PORTMUX_USART0_DEFAULT_gc = (0x00<<0) ; Default pins
@@ -2888,6 +2923,14 @@ PORTMUX_TCA02_ALTERNATE_gc = (0x01<<2) ; Alternate pin
 ; Port Multiplexer TCA0 Output 3 select
 PORTMUX_TCA03_DEFAULT_gc = (0x00<<3) ; Default pin
 PORTMUX_TCA03_ALTERNATE_gc = (0x01<<3) ; Alternate pin
+
+; Port Multiplexer TCA0 Output 4 select
+PORTMUX_TCA04_DEFAULT_gc = (0x00<<4) ; Default pin
+PORTMUX_TCA04_ALTERNATE_gc = (0x01<<4) ; Alternate pin
+
+; Port Multiplexer TCA0 Output 5 select
+PORTMUX_TCA05_DEFAULT_gc = (0x00<<5) ; Default pin
+PORTMUX_TCA05_ALTERNATE_gc = (0x01<<5) ; Alternate pin
 
 ; Port Multiplexer TCB select
 PORTMUX_TCB0_DEFAULT_gc = (0x00<<0) ; Default pin
@@ -4282,24 +4325,24 @@ WDT_WINDOW_8KCLK_gc = (0x0B<<4)     ; 8K cycles (8.2s)
 
 ; ***** CPU REGISTER DEFINITIONS *****************************************
 
-XH	= 27
-XL	= 26
-YH	= 29
-YL	= 28
-ZH	= 31
-ZL	= 30
+XH = 27
+XL = 26
+YH = 29
+YL = 28
+ZH = 31
+ZL = 30
 
 
 ; ***** DATA MEMORY DECLARATIONS *****************************************
 
 
 DATAMEM_START = 0x0000
-DATAMEM_SIZE = 0x9000
-DATAMEM_END = (0x0000 + 0x9000 - 1)
+DATAMEM_SIZE = 0x8800
+DATAMEM_END = (0x0000 + 0x8800 - 1)
 
 EEPROM_START = 0x1400
-EEPROM_SIZE = 0x0080
-EEPROM_END = (0x1400 + 0x0080 - 1)
+EEPROM_SIZE = 0x0040
+EEPROM_END = (0x1400 + 0x0040 - 1)
 EEPROM_PAGE_SIZE = 0x20
 
 FUSES_START = 0x1280
@@ -4307,9 +4350,9 @@ FUSES_SIZE = 0x000A
 FUSES_END = (0x1280 + 0x000A - 1)
 FUSES_PAGE_SIZE = 0x20
 
-INTERNAL_SRAM_START = 0x3F00
-INTERNAL_SRAM_SIZE = 0x0100
-INTERNAL_SRAM_END = (0x3F00 + 0x0100 - 1)
+INTERNAL_SRAM_START = 0x3F80
+INTERNAL_SRAM_SIZE = 0x0080
+INTERNAL_SRAM_END = (0x3F80 + 0x0080 - 1)
 
 IO_START = 0x0000
 IO_SIZE = 0x1100
@@ -4318,11 +4361,11 @@ IO_END = (0x0000 + 0x1100 - 1)
 LOCKBITS_START = 0x128A
 LOCKBITS_SIZE = 0x0001
 LOCKBITS_END = (0x128A + 0x0001 - 1)
-LOCKBITS_PAGE_SIZE = 0x20
+LOCKBITS_PAGE_SIZE =  0x20
 
 MAPPED_PROGMEM_START = 0x8000
-MAPPED_PROGMEM_SIZE = 0x1000
-MAPPED_PROGMEM_END = (0x8000 + 0x1000 - 1)
+MAPPED_PROGMEM_SIZE = 0x0800
+MAPPED_PROGMEM_END = (0x8000 + 0x0800 - 1)
 MAPPED_PROGMEM_PAGE_SIZE = 0x40
 
 PROD_SIGNATURES_START = 0x1103
@@ -4341,8 +4384,8 @@ USER_SIGNATURES_END = (0x1300 + 0x0020 - 1)
 USER_SIGNATURES_PAGE_SIZE = 0x20
 
 PROGMEM_START = 0x0000
-PROGMEM_SIZE = 0x1000
-PROGMEM_END = (0x0000 + 0x1000 - 1)
+PROGMEM_SIZE = 0x0800
+PROGMEM_END = (0x0000 + 0x0800 - 1)
 PROGMEM_PAGE_SIZE = 0x40
 
 
@@ -4360,57 +4403,60 @@ EEPROMEND     = EEPROM_END
 ; ***** INTERRUPT VECTORS, ABSOLUTE ADDRESSES ****************************
 
 ; CRCSCAN interrupt vectors
-CRCSCAN_NMI_vect = 0x0001           ;
+CRCSCAN_NMI_vect = 0x0001           ; 
 
 ; BOD interrupt vectors
-BOD_VLM_vect = 0x0002               ;
+BOD_VLM_vect = 0x0002               ; 
 
 ; PORTA interrupt vectors
-PORTA_PORT_vect = 0x0003            ;
+PORTA_PORT_vect = 0x0003            ; 
+
+; PORTB interrupt vectors
+PORTB_PORT_vect = 0x0004            ; 
 
 ; RTC interrupt vectors
-RTC_CNT_vect = 0x0006               ;
-RTC_PIT_vect = 0x0007               ;
+RTC_CNT_vect = 0x0006               ; 
+RTC_PIT_vect = 0x0007               ; 
 
 ; TCA0 interrupt vectors
-TCA0_LUNF_vect = 0x0008             ;
-TCA0_OVF_vect = 0x0008              ;
-TCA0_HUNF_vect = 0x0009             ;
-TCA0_CMP0_vect = 0x000A             ;
-TCA0_LCMP0_vect = 0x000A            ;
-TCA0_CMP1_vect = 0x000B             ;
-TCA0_LCMP1_vect = 0x000B            ;
-TCA0_CMP2_vect = 0x000C             ;
-TCA0_LCMP2_vect = 0x000C            ;
+TCA0_LUNF_vect = 0x0008             ; 
+TCA0_OVF_vect = 0x0008              ; 
+TCA0_HUNF_vect = 0x0009             ; 
+TCA0_CMP0_vect = 0x000A             ; 
+TCA0_LCMP0_vect = 0x000A            ; 
+TCA0_CMP1_vect = 0x000B             ; 
+TCA0_LCMP1_vect = 0x000B            ; 
+TCA0_CMP2_vect = 0x000C             ; 
+TCA0_LCMP2_vect = 0x000C            ; 
 
 ; TCB0 interrupt vectors
-TCB0_INT_vect = 0x000D              ;
+TCB0_INT_vect = 0x000D              ; 
 
 ; TCD0 interrupt vectors
-TCD0_OVF_vect = 0x000E              ;
-TCD0_TRIG_vect = 0x000F             ;
+TCD0_OVF_vect = 0x000E              ; 
+TCD0_TRIG_vect = 0x000F             ; 
 
 ; AC0 interrupt vectors
-AC0_AC_vect = 0x0010                ;
+AC0_AC_vect = 0x0010                ; 
 
 ; ADC0 interrupt vectors
-ADC0_RESRDY_vect = 0x0011           ;
-ADC0_WCOMP_vect = 0x0012            ;
+ADC0_RESRDY_vect = 0x0011           ; 
+ADC0_WCOMP_vect = 0x0012            ; 
 
 ; TWI0 interrupt vectors
-TWI0_TWIS_vect = 0x0013             ;
-TWI0_TWIM_vect = 0x0014             ;
+TWI0_TWIS_vect = 0x0013             ; 
+TWI0_TWIM_vect = 0x0014             ; 
 
 ; SPI0 interrupt vectors
-SPI0_INT_vect = 0x0015              ;
+SPI0_INT_vect = 0x0015              ; 
 
 ; USART0 interrupt vectors
-USART0_RXC_vect = 0x0016            ;
-USART0_DRE_vect = 0x0017            ;
-USART0_TXC_vect = 0x0018            ;
+USART0_RXC_vect = 0x0016            ; 
+USART0_DRE_vect = 0x0017            ; 
+USART0_TXC_vect = 0x0018            ; 
 
 ; NVMCTRL interrupt vectors
-NVMCTRL_EE_vect = 0x0019            ;
+NVMCTRL_EE_vect = 0x0019            ; 
 
 
 
@@ -4419,6 +4465,7 @@ NVMCTRL_EE_vect = 0x0019            ;
 CRCSCAN_vbase = 0x0001
 BOD_vbase = 0x0002
 PORTA_vbase = 0x0003
+PORTB_vbase = 0x0004
 RTC_vbase = 0x0006
 TCA0_vbase = 0x0008
 TCB0_vbase = 0x000D
@@ -4444,6 +4491,10 @@ BOD_VLM_voffset = 0
 ; PORTA interrupt vector offsets
 
 PORTA_PORT_voffset = 0
+
+; PORTB interrupt vector offsets
+
+PORTB_PORT_voffset = 0
 
 ; RTC interrupt vector offsets
 
