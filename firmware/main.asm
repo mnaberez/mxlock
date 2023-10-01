@@ -14,6 +14,19 @@
 ;13 PA3 out 4080LED 
 ;14 GND
 
+;shift_lock  SLKEY PB0 = 1
+;            SLOUT PA5 = 32
+;            SLLED PA1 = 2
+;
+;caps_lock   CAPSKEY PB1 = 2
+;            CAPSOUT PA6 = 64
+;            CAPSLED PA2 = 4
+;
+;forty_lock  4080KEY PB2 = 4
+;            4080OUT PA7 = 64
+;            4080LED PA3 = 8
+
+
     ;Definitions file "tn214def.asm"
     ;will be included first by the Makefile.
 
