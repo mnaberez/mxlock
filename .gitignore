@@ -1,2 +1,5 @@
+stevekey-backups/
+*-lib-table
 stevekey_*_flash*
 stevekey_*_fuses*
+*.kical_prl
