@@ -1,5 +1,7 @@
 stevekey-backups/
+gerbers/
 *-lib-table
 stevekey_*_flash*
 stevekey_*_fuses*
 *.kical_prl
+*.lck
