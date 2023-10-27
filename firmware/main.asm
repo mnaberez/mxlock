@@ -20,6 +20,12 @@
     .area code (abs)
     .list (me)
 
+;Constants for bit positions used with GPIO functions
+KEY_EXTRA       = 3     ;Extra (4066 contact only)
+KEY_40_80       = 2     ;40/80 key / LED / 4066 contact
+KEY_CAPS_LOCK   = 1     ;Caps Lock key / LED / 4066 contact
+KEY_SHIFT_LOCK  = 0     ;Shift Lock key / LED / 4066 contact
+
     .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
                           ;but ASAVR treats program space as word-addressed.
     rjmp reset
@@ -56,109 +62,136 @@ reset:
     rcall wdog_init
     rcall gpio_init
 
-    ldi r19, 0
-
 main_loop:
     wdr                       ;Keep watchdog happy
     rcall gpio_read_keys
-    eor r19, r16
-    mov r16, r19
-    rcall gpio_set_leds
-    rcall gpio_set_contacts
+    rcall gpio_write_leds
+    rcall gpio_write_contacts
     rjmp main_loop
 
-;Wait 1ms.  Destroy R16,R17
-delay_1ms:
-    ldi r16, 6
-1$: ldi r17, 0xc5
+;Wait ~1ms
+wait_1ms:
+    push r16
+    ldi r16, 0x4
+1$: ldi r17, 0xe1
 2$: dec r17
     brne 2$
     dec r16
     brne 1$
+    pop r16
     ret
 
 ;GPIO =======================================================================
 
 ;
-;The GPIO routines abstract the I/O pins such that the same bit
-;pattern is used for the key inputs, LED outputs, and 4066 outputs.
+;The GPIO routines abstract the I/O pins such that the bit
+;positions in the KEY_* constants are used for all the 
+;routines (the key inputs, LED outputs, and 4066 contacts).
+;
 ;The bit values use positive logic:
 ;
 ; - A bit of "0" means key up / LED off / 4066 contact open
 ; - A bit of "1" means key down / LED on / 4066 contact closed
 ;
 
-;Read the key switch inputs and return them in R16
+;Read all the key switch inputs and return them in R16
 ;0=key up, 1=key down
 ;
-;R16:
-;  Bit 3 = Always 0 (would be Extra key)
-;  Bit 2 = 40/80 key 
-;  Bit 1 = Caps Lock key
-;  Bit 0 = Shift Lock key
-;
 gpio_read_keys:
-    ;Read PORTB_IN and convert to R16 bits
-    lds r16, PORTB_IN
-    ldi r17, 1<<2 | 1<<1 | 1<<0
-    and r16, r17
-    eor r16, r17  ;PORTB_IN bits are inverted (0=key down)
+    lds r17, PORTB_IN
+
+    ;Convert PORTB_OUT bits to R16 bits
+    clr r16
+    sbrs r17, 2                 ;PB2 clear
+    ori r16, 1<<KEY_40_80       ;  sets 40/80 bit
+    sbrs r17, 1                 ;PB1 clear
+    ori r16, 1<<KEY_CAPS_LOCK   ;  sets Caps Lock bit
+    sbrs r17, 0                 ;PB0 clear
+    ori r16, 1<<KEY_SHIFT_LOCK  ;  sets Shift Lock bit
     ret
 
-;Set the 4066 contacts from the value in R16
+;Write all the 4066 contacts from the value in R16
 ;0=contact open, 1=contact closed
 ;
-;R16:
-;  Bit 3 = Extra contact
-;  Bit 2 = 40/80 contact
-;  Bit 1 = Caps Lock contact
-;  Bit 0 = Shift Lock contact
-;
-gpio_set_contacts:
+gpio_write_contacts:
     push r16
 
     ;Convert R16 bits to PORTA_OUT bits
-    lsl r16 
-    lsl r16 
-    lsl r16 
-    lsl r16 
-    lsl r16 
-    andi r16, 1<<7 | 1<<6 | 1<<5 | 1<<4
+    clr r17
+    sbrc r16, KEY_SHIFT_LOCK    
+    ori r17, 1<<5               ;Shift Lock bit set sets PA5
+    sbrc r16, KEY_CAPS_LOCK     
+    ori r17, 1<<6               ;Caps Lock bit set sets PA6
+    sbrc r16, KEY_40_80         
+    ori r17, 1<<7               ;40/80 bit set sets PA7
+    sbrc r16, KEY_EXTRA         
+    ori r17, 1<<4               ;Extra bit set sets PA4
 
     ;Set/clear bits in PORTA_OUT
-    lds r17, PORTA_OUT
-    andi r17, 0xff ^ (1<<7 | 1<<6 | 1<<5 | 1<<4)
-    or r17, r16
-    sts PORTA_OUT, r17
+    lds r16, PORTA_OUT
+    andi r16, 0xff ^ (1<<7 | 1<<6 | 1<<5 | 1<<4)
+    or r16, r17
+    sts PORTA_OUT, r16
 
     pop r16
     ret
 
-;Set the LEDs from the value in R16
+;Read the state of all the 4066 contacts into R16
+;0=contact open, 1=contact closed
+;
+gpio_read_contacts:
+    lds r17, PORTA_OUT
+
+    ;Convert PORTA_OUT bits to R16 bits
+    clr r16
+    sbrc r17, 5                 
+    ori r16, 1<<KEY_SHIFT_LOCK  ;PA5 set sets Shift Lock bit
+    sbrc r17, 6                 
+    ori r16, 1<<KEY_CAPS_LOCK   ;PA6 set sets Caps Lock bit
+    sbrc r17, 7                 
+    ori r16, 1<<KEY_40_80       ;PA7 set sets 40/80 bit
+    sbrc R17, 4                 
+    ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
+    ret
+
+;Write all the LED outputs from the value in R16
 ;0=LED off, 1=LED on
 ;
-;R16:
-;  Bit 3 = Ignored (would be Extra LED)
-;  Bit 2 = 40/80 LED
-;  Bit 1 = Caps Lock LED
-;  Bit 0 = Shift Lock LED
-;
-gpio_set_leds:
-    push r16
+gpio_write_leds:
+    push r16 
 
     ;Convert R16 bits to PORTA_OUT bits
-    lsl r16
-    ldi r17, 1<<3 | 1<<2 | 1<<1
-    and r16, r17
-    eor r16, r17  ;PORTA_OUT bits are inverted (0=LED on)
+    clr r17
+    sbrs r16, KEY_SHIFT_LOCK    
+    ori r17, 1<<1               ;Shift Lock bit clear sets PA1
+    sbrs r16, KEY_CAPS_LOCK     
+    ori r17, 1<<2               ;Caps Lock bit clear sets PA2
+    sbrs r16, KEY_40_80         
+    ori r17, 1<<3               ;40/80 bit clear sets PA3
 
     ;Set/clear bits in PORTA_OUT
-    lds r17, PORTA_OUT
-    andi r17, 0xff ^ (1<<3 | 1<<2 | 1<<1)    
-    or r17, r16
-    sts PORTA_OUT, r17
+    lds r16, PORTA_OUT
+    andi r16, 0xff ^ (1<<3 | 1<<2 | 1<<1)    
+    or r16, r17
+    sts PORTA_OUT, r16
 
     pop r16
+    ret
+
+;Read the state of all the LED outputs into R16
+;0=LED off, 1=LED on
+;
+gpio_read_leds:
+    lds r17, PORTA_OUT
+
+    ;Convert PORTA_OUT bits to R16
+    clr r16
+    sbrs r17, 3                 
+    ori r16, 1<<KEY_40_80       ;PA3 clear sets 40/80 bit
+    sbrs r17, 2                 
+    ori r16, 1<<KEY_CAPS_LOCK   ;PA2 clear sets Caps Lock bit
+    sbrs r17, 1                 
+    ori r16, 1<<KEY_SHIFT_LOCK  ;PA1 clear sets Shift Lock bit
     ret
 
 ;Pull the /CBMRESET pin to GND, resetting the CBM computer
@@ -198,7 +231,7 @@ gpio_init:
 
     ;/CBMRESET Output
     ldi r16, 1<<3                   ;PB3
-    sts PORTA_OUTCLR, r16           ;Set /CBMRESET initially high (0=high)
+    sts PORTB_OUTCLR, r16           ;Set /CBMRESET initially high (0=high)
     sts PORTB_DIRSET, r16           ;Set PB3 as output
     ret
 
