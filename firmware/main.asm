@@ -4,7 +4,7 @@
 ;3  PA5 out SLOUT 
 ;4  PA6 out CAPSOUT 
 ;5  PA7 out 4080OUT 
-;6  PB3 out /CBMRESET (0=/CBMRESET=high, 1=/CBMRESET=low)
+;6  PB3 out /CBMRESET (0=/CBMRESET=open, 1=/CBMRESET=low)
 ;7  PB2 in 4080KEY (0=down, 1=up)
 ;8  PB1 in CAPSKEY 
 ;9  PB0 in SLKEY 
@@ -161,11 +161,25 @@ gpio_set_leds:
     pop r16
     ret
 
+;Pull the /CBMRESET pin to GND, resetting the CBM computer
+;
+gpio_cbmreset_on:
+    ldi r16, 1<<3           ;PB3
+    sts PORTB_OUTSET, r16   ;set PB3=1 which pulls /CBMRESET low
+    ret
+
+;Open the /CBMRESET pin, allowing the CBM computer to run
+;
+gpio_cbmreset_off:
+    ldi r16, 1<<3           ;PB3
+    sts PORTB_OUTCLR, r16   ;set PB3=0 which makes /CBMRESET open
+    ret
+
 ;Set initial GPIO directions and states
 ;
 ; - LED pins as outputs; LEDs not lit
 ; - 4066 pins as outputs; contacts open
-; - /CBMRESET pint as output; /CBMRESET=high
+; - /CBMRESET pin as output; /CBMRESET=open
 ;
 gpio_init:
     ;Key Inputs
