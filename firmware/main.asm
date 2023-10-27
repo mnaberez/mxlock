@@ -71,13 +71,83 @@ reset:
 
 main_loop:
     wdr                       ;Keep watchdog happy
+    rcall read_keys
+    rcall set_leds
+    rcall set_contacts
     rjmp main_loop
 
-;Set up GPIO directions (UART pin directions are set in uart_init)
+;Set up GPIO directions
 gpio_init:
-    ldi r16, 1<<2 | 1<<1    ;PA2, PA1 = input
-    sts PORTA_DIRCLR, r16
+    ;Button Inputs
+    ldi r16, 1<<2 | 1<<1 | 1<<0     ;PB2, PB1, PB0
+    sts PORTB_DIRCLR, r16           ;set pins as input
+
+    ;4066 Outputs
+    ldi r16, 1<<7 | 1<<6 | 1<<5 | 1<<4  ;PA7, PA6, PA5, PA4
+    sts PORTA_OUTCLR, r16               ;set 4066s initially off (0=off)
+    sts PORTA_DIRSET, r16               ;set pins as outputs
+
+    ;LED Outputs
+    ldi r16, 1<<3 | 1<<2 | 1<<1     ;PA3, PA2, PA1
+    sts PORTA_OUTSET, r16           ;sets LEDs initially off (1=off)
+    sts PORTA_DIRSET, r16           ;set pins as outputs
     ret
+
+
+;Returns key status in R16:
+;
+;   Bit 2 = 4080 key (0=up, 1=down)
+;   Bit 1 = caps key
+;   Bit 0 = shift lock key
+;
+read_keys:
+    ldi r17, 1<<2 | 1<<1 | 1<<0
+    lds r16, PORTB_IN
+    eor r16, r17
+    ret
+
+;Sets LEDs from R16
+;
+;   Bit 2 = 4080 LED (0=off, 1=on)
+;   Bit 1 = caps lock LED
+;   Bit 0 = shift lock LED
+;
+set_leds:
+    push r16
+    lsl r16
+    ldi r17, 1<<3 | 1<<2 | 1<<1
+    and r16, r17
+    eor r16, r17
+
+    lds r17, PORTA_OUT
+    andi r17, 0xff ^ (1<<3 | 1<<2 | 1<<1)    
+    or r17, r16
+    sts PORTA_OUT, r17
+    pop r16
+    ret
+
+;Sets 4066 contacts from R16
+;
+;   Bit 2 = 4080 contact (0=off, 1=on)
+;   Bit 1 = caps lock contact
+;   Bit 0 = shift lock contact
+;
+set_contacts:
+    push r16
+    lsl r16 
+    lsl r16 
+    lsl r16 
+    lsl r16 
+    lsl r16 
+    andi r16, 1<<7 | 1<<6 | 1<<5 | 1<<4
+
+    lds r17, PORTA_OUT
+    andi r17, 0xff ^ (1<<7 | 1<<6 | 1<<5 | 1<<4)
+    or r17, r16
+    sts PORTA_OUT, r17
+    pop r16
+    ret
+
 
 ;Ensure the watchdog was started by the fuses and reset the timer.
 ;The WDR instruction must be executed at least once every 4 seconds
