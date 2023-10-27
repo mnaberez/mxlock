@@ -63,21 +63,49 @@ reset:
     rcall gpio_init
 
 main_loop:
-    wdr                       ;Keep watchdog happy
-    rcall gpio_read_keys
-    rcall gpio_write_leds
-    rcall gpio_write_contacts
+    wdr                         ;Keep watchdog happy
+
+    rcall read_debounced_keys   ;Read keys
+    cp r16, r17                 ;Same as last keys?
+    mov r17, r16
+    breq main_loop              ;  Yes, keep looping
+
+    ;Keys have changed
+
+    rcall gpio_read_contacts    ;Read 4066 outputs
+    eor r16, r17                ;Flip bits for keys pressed
+    rcall gpio_write_contacts   ;Update 4066 outputs
+    rcall gpio_write_leds       ;Update LEDs
     rjmp main_loop
 
-;Wait ~1ms
+read_debounced_keys:
+    push r18
+    push r17
+
+1$: ldi r18, 20+1             ;20ms debounce
+2$: rcall wait_1ms
+    rcall gpio_read_keys      ;Returns keys in R16
+    cp r16, r17               ;Same as last keys?
+    mov r17, r16              
+    brne 1$                   ;  No: start all over
+
+    dec r18                    
+    brne 2$                   ;Loop for debounce time
+
+    pop r17
+    pop r18
+    ret
+
 wait_1ms:
     push r16
-    ldi r16, 0x4
+    push r17
+    ldi r16, 0x04
 1$: ldi r17, 0xe1
 2$: dec r17
     brne 2$
     dec r16
     brne 1$
+    pop r17
     pop r16
     ret
 
@@ -98,6 +126,7 @@ wait_1ms:
 ;0=key up, 1=key down
 ;
 gpio_read_keys:
+    push r17
     lds r17, PORTB_IN
 
     ;Convert PORTB_OUT bits to R16 bits
@@ -108,6 +137,7 @@ gpio_read_keys:
     ori r16, 1<<KEY_CAPS_LOCK   ;  sets Caps Lock bit
     sbrs r17, 0                 ;PB0 clear
     ori r16, 1<<KEY_SHIFT_LOCK  ;  sets Shift Lock bit
+    pop r17
     ret
 
 ;Write all the 4066 contacts from the value in R16
@@ -115,6 +145,7 @@ gpio_read_keys:
 ;
 gpio_write_contacts:
     push r16
+    push r17
 
     ;Convert R16 bits to PORTA_OUT bits
     clr r17
@@ -133,6 +164,7 @@ gpio_write_contacts:
     or r16, r17
     sts PORTA_OUT, r16
 
+    pop r17
     pop r16
     ret
 
@@ -140,6 +172,7 @@ gpio_write_contacts:
 ;0=contact open, 1=contact closed
 ;
 gpio_read_contacts:
+    push r17
     lds r17, PORTA_OUT
 
     ;Convert PORTA_OUT bits to R16 bits
@@ -152,6 +185,8 @@ gpio_read_contacts:
     ori r16, 1<<KEY_40_80       ;PA7 set sets 40/80 bit
     sbrc R17, 4                 
     ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
+
+    pop r17
     ret
 
 ;Write all the LED outputs from the value in R16
@@ -159,6 +194,7 @@ gpio_read_contacts:
 ;
 gpio_write_leds:
     push r16 
+    push r17
 
     ;Convert R16 bits to PORTA_OUT bits
     clr r17
@@ -175,6 +211,7 @@ gpio_write_leds:
     or r16, r17
     sts PORTA_OUT, r16
 
+    pop r17
     pop r16
     ret
 
@@ -182,6 +219,7 @@ gpio_write_leds:
 ;0=LED off, 1=LED on
 ;
 gpio_read_leds:
+    push r17
     lds r17, PORTA_OUT
 
     ;Convert PORTA_OUT bits to R16
@@ -192,6 +230,8 @@ gpio_read_leds:
     ori r16, 1<<KEY_CAPS_LOCK   ;PA2 clear sets Caps Lock bit
     sbrs r17, 1                 
     ori r16, 1<<KEY_SHIFT_LOCK  ;PA1 clear sets Shift Lock bit
+
+    pop r17
     ret
 
 ;Pull the /CBMRESET pin to GND, resetting the CBM computer
