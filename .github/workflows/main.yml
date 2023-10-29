@@ -19,7 +19,7 @@ jobs:
     - name: Install srecord
       run: sudo apt-get install srecord
 
-    - name: Build the firmware (Attiny212 version)
+    - name: Build the firmware (ATtiny214 version)
       run: |
         make -C firmware MCU=t214
         cat firmware/stevekey_t214_flash.lst
