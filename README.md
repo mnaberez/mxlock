@@ -10,7 +10,7 @@ Stevekey solves this problem by allowing regular momentary MX keys to be used fo
 
 Features:
 
- - Simulates up to 3 latching keys using an ATtiny214 and a 4066
+ - Simulates up to 3 latching keys using an [ATtiny214](https://web.archive.org/web/20231029180615if_/https://ww1.microchip.com/downloads/en/DeviceDoc/40001912A.pdf) and a [4066](https://web.archive.org/web/20231029180910if_/https://www.ti.com/lit/ds/symlink/cd4066b-mil.pdf)
  - Shows the on/off state of each key with LEDs
  - Remembers the latch states between power cycles (useful for `40/80`)
  - Resets the computer by pulling `/RESET` low if `SHIFT LOCK` is held down
@@ -19,11 +19,11 @@ Features:
 
 The hardware in this repository is only used for development.  The circuit is intended to be integrated onto the keyboard's circuit board.  For an example of a keyboard using the circuit, see Steve's [C128SX keyboard](http://6502.org/users/sjgray/projects/mxkeyboards/).
 
-Although Stevekey was designed for use on Steve's keyboards, it can be used on other keyboards as well, as long as the key contacts can be closed using a 4066.  See [`hardware/`](./hardware/) for the schematic.
+Although Stevekey was designed for use on Steve's keyboards, it can be used on other keyboards as well, as long as the key contacts can be closed using a 4066.  See [`hardware/`](./hardware/) for the schematic and parts list.
 
 ## Firmware
 
-The firmware is written in AVR assembly using ASxxxx.  It can be programmed with the [Atmel-ICE](https://www.microchip.com/en-us/development-tool/atatmel-ice) or another UPDI programmer.  See [`firmware/`](./firmware/) for the source code.
+The firmware is written in AVR assembly language and is assembled using [ASxxxx](https://shop-pdp.net/ashtml/).  It can be flashed with the [Atmel-ICE](https://www.microchip.com/en-us/development-tool/atatmel-ice) or another UPDI programmer.  See [`firmware/`](./firmware/) for the source code and instructions.
 
 ## Author
 
