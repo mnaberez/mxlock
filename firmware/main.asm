@@ -20,6 +20,10 @@
     .area code (abs)
     .list (me)
 
+;RAM
+current_keys  = SRAM_START+0    ;Current state of keys
+previous_keys = SRAM_START+1    ;State of keys last time around the main loop
+
 ;Constants for bit positions used with GPIO functions
 KEY_EXTRA       = 3     ;Extra (4066 contact only)
 KEY_40_80       = 2     ;40/80 key / LED / 4066 contact
@@ -62,22 +66,94 @@ reset:
     rcall wdog_init
     rcall gpio_init
 
+    rcall read_debounced_keys
+    sts current_keys, r16
+    sts previous_keys, r16
+
 main_loop:
     wdr                         ;Keep watchdog happy
 
     rcall read_debounced_keys   ;Read keys
-    cp r16, r17                 ;Same as last keys?
-    mov r17, r16
-    breq main_loop              ;  Yes, keep looping
+    sts current_keys, r16
 
-    ;Keys have changed
+    rcall update_shift_lock     ;Check Shift Lock, update 4066 if needed
+    rcall update_caps_lock      ;  ... Caps Lock
+    rcall update_40_80          ;  ... 40/80
 
-    rcall gpio_read_contacts    ;Read 4066 outputs
-    eor r16, r17                ;Flip bits for keys pressed
-    rcall gpio_write_contacts   ;Update 4066 outputs
-    rcall gpio_write_leds       ;Update LEDs
-    rjmp main_loop
+    rcall gpio_read_contacts    
+    rcall gpio_write_leds       ;Update LEDs from 4066 contacts
 
+    lds r16, current_keys       
+    sts previous_keys, r16      ;Save keys for next time around
+    rjmp main_loop              ;Loop forever
+
+;Check the Shift Lock key, update its 4066 contact if needed
+;
+update_shift_lock:
+    lds r16, current_keys
+    andi r16, 1<<KEY_SHIFT_LOCK
+    lds r17, previous_keys
+    andi r17, 1<<KEY_SHIFT_LOCK
+    cp r16, r17
+    brne 1$                     
+    ret                         ;Shift Lock has not changed
+
+1$: lds r16, current_keys    
+    sbrs r16, KEY_SHIFT_LOCK    ;Skip return if Shift Lock is down
+    ret
+
+    ;Shift lock is down
+2$: rcall gpio_read_contacts
+    ldi r17, 1<<KEY_SHIFT_LOCK
+    eor r16, r17                ;Toggle Shift Lock contact
+    rjmp gpio_write_contacts
+
+;Check the Caps Lock key, update its 4066 contact if needed
+;
+update_caps_lock:
+    lds r16, current_keys
+    andi r16, 1<<KEY_CAPS_LOCK
+    lds r17, previous_keys
+    andi r17, 1<<KEY_CAPS_LOCK
+    cp r16, r17
+    brne 1$                     
+    ret                         ;Caps Lock has not changed
+
+    ;Caps lock has changed
+1$: lds r16, current_keys    
+    sbrs r16, KEY_CAPS_LOCK     ;Skip return if Caps Lock is down
+    ret
+
+    ;Caps lock is down
+2$: rcall gpio_read_contacts
+    ldi r17, 1<<KEY_CAPS_LOCK
+    eor r16, r17                ;Toggle Caps Lock contact
+    rjmp gpio_write_contacts
+
+;Check the 40/80 key, update its 4066 contact if needed
+;
+update_40_80:
+    lds r16, current_keys
+    andi r16, 1<<KEY_40_80
+    lds r17, previous_keys
+    andi r17, 1<<KEY_40_80
+    cp r16, r17
+    brne 1$                     
+    ret                         ;40/80 has not changed
+
+    ;40/80 lock has changed
+1$: lds r16, current_keys    
+    sbrs r16, KEY_40_80         ;Skip return if 40/80 is down
+    ret
+
+    ;40/80 is down
+2$: rcall gpio_read_contacts
+    ldi r17, 1<<KEY_40_80
+    eor r16, r17                ;Toggle 40/80 contact
+    rjmp gpio_write_contacts
+
+;Read the keys with gpio_read_keys and debounce for 20ms
+;
 read_debounced_keys:
     push r18
     push r17
