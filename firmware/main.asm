@@ -21,8 +21,9 @@
     .list (me)
 
 ;RAM
-current_keys  = SRAM_START+0    ;Current state of keys
-previous_keys = SRAM_START+1    ;State of keys last time around the main loop
+current_keys     = SRAM_START+0    ;Current state of keys
+previous_keys    = SRAM_START+1    ;State of keys last time around the main loop
+shift_down_ticks = SRAM_START+2    ;Number of 20ms ticks Shift Lock has been held down
 
 ;Constants for bit positions used with GPIO functions
 KEY_EXTRA       = 3     ;Extra (4066 contact only)
@@ -80,8 +81,10 @@ main_loop:
     rcall update_caps_lock      ;  ... Caps Lock
     rcall update_40_80          ;  ... 40/80
 
-    rcall gpio_read_contacts    
-    rcall gpio_write_leds       ;Update LEDs from 4066 contacts
+    rcall update_reset          ;Reset computer if Shift Lock is held down
+
+    rcall gpio_read_contacts    ;Read 4066 contact states
+    rcall gpio_write_leds       ;  and update LEDs from them
 
     lds r16, current_keys       
     sts previous_keys, r16      ;Save keys for next time around
@@ -95,18 +98,28 @@ update_shift_lock:
     lds r17, previous_keys
     andi r17, 1<<KEY_SHIFT_LOCK
     cp r16, r17
-    brne 1$                     
-    ret                         ;Shift Lock has not changed
+    breq 3$                     ;Shift Lock has not changed
 
+    ;Shift lock has changed
 1$: lds r16, current_keys    
-    sbrs r16, KEY_SHIFT_LOCK    ;Skip return if Shift Lock is down
+    sbrs r16, KEY_SHIFT_LOCK     ;Skip return if Shift Lock is down
     ret
 
     ;Shift lock is down
 2$: rcall gpio_read_contacts
     ldi r17, 1<<KEY_SHIFT_LOCK
     eor r16, r17                ;Toggle Shift Lock contact
-    rjmp gpio_write_contacts
+    rcall gpio_write_contacts
+
+3$: lds r16, current_keys
+    lds r17, shift_down_ticks
+    sbrs r16, KEY_SHIFT_LOCK
+    clr r17
+    cpi r17, #0xff
+    breq 4$
+    inc r17
+4$: sts shift_down_ticks, r17
+    ret
 
 ;Check the Caps Lock key, update its 4066 contact if needed
 ;
@@ -151,6 +164,24 @@ update_40_80:
     ldi r17, 1<<KEY_40_80
     eor r16, r17                ;Toggle 40/80 contact
     rjmp gpio_write_contacts
+
+update_reset:
+    lds r16, shift_down_ticks   
+    cpi r16, #1500/20           ;Held down for >=1500 milliseconds?
+    brlo 2$
+
+    rcall gpio_cbmreset_on
+    ldi r16, 50+1
+1$: rcall wait_1ms
+    dec r16
+    brne 1$
+    rcall gpio_cbmreset_off
+    clr r16
+    sts shift_down_ticks,r16
+    lds r16, current_keys
+    andi r16, (1<<KEY_SHIFT_LOCK)^0xFF
+    sts current_keys, r16
+2$: ret
 
 ;Read the keys with gpio_read_keys and debounce for 20ms
 ;
