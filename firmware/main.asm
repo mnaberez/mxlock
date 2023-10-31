@@ -21,9 +21,13 @@
     .list (me)
 
 ;RAM
-current_keys     = SRAM_START+0    ;Current state of keys
-previous_keys    = SRAM_START+1    ;State of keys last time around the main loop
-shift_down_ticks = SRAM_START+2    ;Number of 20ms ticks Shift Lock has been held down
+current_keys     = SRAM_START+0 ;Current state of keys
+previous_keys    = SRAM_START+1 ;State of keys last time around the main loop
+shift_down_ticks = SRAM_START+2 ;Number of ticks Shift Lock has been held down
+
+;Constants
+TICK_MS         = 20    ;Number of milliseconds in one tick
+RESET_MS        = 50    ;Number of milliseconds to hold /CBMRESET low to reset
 
 ;Constants for bit positions used with GPIO functions
 KEY_EXTRA       = 3     ;Extra (4066 contact only)
@@ -74,54 +78,31 @@ reset:
 main_loop:
     wdr                         ;Keep watchdog happy
 
-    rcall read_debounced_keys   ;Read keys
+    rcall read_debounced_keys   ;Read keys (delays 1 tick to debounce)
     sts current_keys, r16
 
-    rcall update_shift_lock     ;Check Shift Lock, update 4066 if needed
-    rcall update_caps_lock      ;  ... Caps Lock
-    rcall update_40_80          ;  ... 40/80
-
-    rcall update_reset          ;Reset computer if Shift Lock is held down
-
-    rcall gpio_read_contacts    ;Read 4066 contact states
-    rcall gpio_write_leds       ;  and update LEDs from them
+    rcall task_caps_lock        ;Check Caps Lock, update 4066 contacts
+    rcall task_40_80            ;  ... 40/80
+    rcall task_shift_lock       ;  ... Shift Lock
+    rcall task_shift_lock_reset ;Reset computer if Shift Lock is held down
+    rcall task_leds             ;Update LEDs
 
     lds r16, current_keys       
     sts previous_keys, r16      ;Save keys for next time around
     rjmp main_loop              ;Loop forever
 
-;Check the Shift Lock key, update its 4066 contact if needed
+;TASKS ======================================================================
+
 ;
-update_shift_lock:
-    lds r16, current_keys
-    lds r17, previous_keys
-    eor r17, r16
-    sbrs r17, KEY_SHIFT_LOCK    ;Skip rjmp if Shift Lock has changed
-    rjmp 1$
-
-    ;Shift lock has changed
-    sbrs r16, KEY_SHIFT_LOCK    ;Skip return if Shift Lock is down
-    ret
-
-    ;Shift lock has changed and is down
-    rcall gpio_read_contacts
-    ldi r17, 1<<KEY_SHIFT_LOCK
-    eor r16, r17                ;Toggle Shift Lock contact
-    rcall gpio_write_contacts
-
-1$: lds r16, current_keys
-    lds r17, shift_down_ticks
-    sbrs r16, KEY_SHIFT_LOCK
-    clr r17
-    cpi r17, #0xff
-    breq 2$
-    inc r17
-2$: sts shift_down_ticks, r17
-    ret
-
-;Check the Caps Lock key, update its 4066 contact if needed
+;The main loop calls all of these tasks each time around.  There is a 
+;delay of 1 tick between each iteration of the main loop, which these
+;tasks can use for timing.
 ;
-update_caps_lock:
+
+;Check for Caps Lock keypress
+;Update its 4066 contact on transition from not pressed to pressed
+;
+task_caps_lock:
     lds r16, current_keys
     lds r17, previous_keys
     eor r17, r16
@@ -135,9 +116,10 @@ update_caps_lock:
     eor r16, r17                ;Toggle Caps Lock contact
     rjmp gpio_write_contacts
 
-;Check the 40/80 key, update its 4066 contact if needed
+;Check for 40/80 keypress
+;Update its 4066 contact on transition from not pressed to pressed
 ;
-update_40_80:
+task_40_80:
     lds r16, current_keys
     lds r17, previous_keys
     eor r17, r16
@@ -151,33 +133,67 @@ update_40_80:
     eor r16, r17                ;Toggle 40/80 contact
     rjmp gpio_write_contacts
 
-;Check if Shift Lock has been held down long enough, reset CBM if so
+;Check for Shift Lock keypress
+;Update its 4066 contact on transition from not pressed to pressed
 ;
-update_reset:
-    lds r16, shift_down_ticks   
-    cpi r16, #1500/20           ;Held down for >=1500 milliseconds?
-    brlo 2$
+task_shift_lock:
+    lds r16, current_keys
+    lds r17, previous_keys
+    eor r17, r16
+    sbrc r17, KEY_SHIFT_LOCK     ;Skip next if Shift Lock has not changed
+    sbrs r16, KEY_SHIFT_LOCK     ;Skip next if Shift Lock is down
+    ret
+
+    ;Shift lock has changed and is down
+    rcall gpio_read_contacts
+    ldi r17, 1<<KEY_SHIFT_LOCK
+    eor r16, r17                 ;Toggle Shift Lock contact
+    rjmp gpio_write_contacts
+
+;Check if Shift Lock is being held down
+;Reset CBM if held down long enough
+;
+task_shift_lock_reset:
+    lds r16, current_keys
+    lds r17, shift_down_ticks
+    sbrs r16, KEY_SHIFT_LOCK    ;Skip next if Shift Key is down
+    clr r17
+    cpi r17, #0xff              ;Cap tick counter (do not wrap to 0)
+    breq 1$
+    inc r17
+1$: sts shift_down_ticks, r17
+
+    cpi r17, #1500/TICK_MS      ;Held down for >=1500 milliseconds?
+    brlo 3$
 
     rcall gpio_cbmreset_on
-    ldi r16, 50+1
-1$: rcall wait_1ms
+    ldi r16, RESET_MS+1
+2$: rcall wait_1ms
     dec r16
-    brne 1$
+    brne 2$
     rcall gpio_cbmreset_off
     clr r16
     sts shift_down_ticks,r16
     lds r16, current_keys
     andi r16, (1<<KEY_SHIFT_LOCK)^0xFF
     sts current_keys, r16
-2$: ret
+3$: ret
 
-;Read the keys with gpio_read_keys and debounce for 20ms
+;Update the LEDs from the 4066 contacts
+;
+task_leds:
+  rcall gpio_read_contacts    ;Read 4066 contact states
+  rjmp gpio_write_leds        ;  and update LEDs from them
+
+;UTILITIES ==================================================================
+
+;Read the keys with gpio_read_keys and debounce for one tick
 ;
 read_debounced_keys:
     push r18
     push r17
 
-1$: ldi r18, 20+1             ;20ms debounce
+1$: ldi r18, TICK_MS+1        ;Debounce time
 2$: rcall wait_1ms
     rcall gpio_read_keys      ;Returns keys in R16
     cp r16, r17               ;Same as last keys?
@@ -191,6 +207,8 @@ read_debounced_keys:
     pop r18
     ret
 
+;Busy wait for 1 millisecond
+;
 wait_1ms:
     push r16
     push r17
