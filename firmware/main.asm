@@ -94,51 +94,43 @@ main_loop:
 ;
 update_shift_lock:
     lds r16, current_keys
-    andi r16, 1<<KEY_SHIFT_LOCK
     lds r17, previous_keys
-    andi r17, 1<<KEY_SHIFT_LOCK
-    cp r16, r17
-    breq 3$                     ;Shift Lock has not changed
+    eor r17, r16
+    sbrs r17, KEY_SHIFT_LOCK    ;Skip rjmp if Shift Lock has changed
+    rjmp 1$
 
     ;Shift lock has changed
-1$: lds r16, current_keys    
-    sbrs r16, KEY_SHIFT_LOCK     ;Skip return if Shift Lock is down
+    sbrs r16, KEY_SHIFT_LOCK    ;Skip return if Shift Lock is down
     ret
 
-    ;Shift lock is down
-2$: rcall gpio_read_contacts
+    ;Shift lock has changed and is down
+    rcall gpio_read_contacts
     ldi r17, 1<<KEY_SHIFT_LOCK
     eor r16, r17                ;Toggle Shift Lock contact
     rcall gpio_write_contacts
 
-3$: lds r16, current_keys
+1$: lds r16, current_keys
     lds r17, shift_down_ticks
     sbrs r16, KEY_SHIFT_LOCK
     clr r17
     cpi r17, #0xff
-    breq 4$
+    breq 2$
     inc r17
-4$: sts shift_down_ticks, r17
+2$: sts shift_down_ticks, r17
     ret
 
 ;Check the Caps Lock key, update its 4066 contact if needed
 ;
 update_caps_lock:
     lds r16, current_keys
-    andi r16, 1<<KEY_CAPS_LOCK
     lds r17, previous_keys
-    andi r17, 1<<KEY_CAPS_LOCK
-    cp r16, r17
-    brne 1$                     
-    ret                         ;Caps Lock has not changed
-
-    ;Caps lock has changed
-1$: lds r16, current_keys    
-    sbrs r16, KEY_CAPS_LOCK     ;Skip return if Caps Lock is down
+    eor r17, r16
+    sbrc r17, KEY_CAPS_LOCK     ;Skip next if Caps Lock has not changed
+    sbrs r16, KEY_CAPS_LOCK     ;Skip next if Caps Lock is down
     ret
 
-    ;Caps lock is down
-2$: rcall gpio_read_contacts
+    ;Caps lock has changed and is down
+    rcall gpio_read_contacts
     ldi r17, 1<<KEY_CAPS_LOCK
     eor r16, r17                ;Toggle Caps Lock contact
     rjmp gpio_write_contacts
@@ -147,24 +139,20 @@ update_caps_lock:
 ;
 update_40_80:
     lds r16, current_keys
-    andi r16, 1<<KEY_40_80
     lds r17, previous_keys
-    andi r17, 1<<KEY_40_80
-    cp r16, r17
-    brne 1$                     
-    ret                         ;40/80 has not changed
-
-    ;40/80 lock has changed
-1$: lds r16, current_keys    
-    sbrs r16, KEY_40_80         ;Skip return if 40/80 is down
+    eor r17, r16
+    sbrc r17, KEY_40_80         ;Skip next if 40/80 has not changed
+    sbrs r16, KEY_40_80         ;Skip next if 40/80 is down
     ret
 
-    ;40/80 is down
-2$: rcall gpio_read_contacts
+    ;40/80 has changed and is down
+    rcall gpio_read_contacts
     ldi r17, 1<<KEY_40_80
     eor r16, r17                ;Toggle 40/80 contact
     rjmp gpio_write_contacts
 
+;Check if Shift Lock has been held down long enough, reset CBM if so
+;
 update_reset:
     lds r16, shift_down_ticks   
     cpi r16, #1500/20           ;Held down for >=1500 milliseconds?
