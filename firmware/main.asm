@@ -90,9 +90,11 @@ main_loop:
     rcall task_shift_lock       ;  ... Shift Lock
     rcall task_shift_lock_reset ;Reset computer if Shift Lock is held down
     rcall task_leds             ;Update LEDs
+    rcall task_eeprom           ;Store 4066 contacts in EEPROM
 
     lds r16, current_keys       
     sts previous_keys, r16      ;Save keys for next time around
+
     rjmp main_loop              ;Loop forever
 
 ;TASKS ======================================================================
@@ -202,8 +204,27 @@ task_shift_lock_reset:
 ;Update the LEDs from the 4066 contacts
 ;
 task_leds:
-  rcall gpio_read_contacts    ;Read 4066 contact states
-  rjmp gpio_write_leds        ;  and update LEDs from them
+    rcall gpio_read_contacts    ;Read 4066 contact states
+    rjmp gpio_write_leds        ;  and update LEDs from them
+
+;Update 4066 contact state in EEPROM if needed
+;
+task_eeprom:
+    lds r16, current_keys
+    or r16, r16
+    brne 1$                     ;Do nothing if any key is down
+
+    rcall eeprom_read_contacts
+    mov r17, r16
+    rcall gpio_read_contacts
+    cp r16, r17
+    breq 1$                     ;Do nothing if no change
+
+    ;Contacts do not match the EEPROM, time to write to the EEPROM
+
+    rcall eeprom_write_contacts
+
+1$: ret
 
 ;UTILITIES ==================================================================
 
@@ -418,8 +439,25 @@ gpio_init:
 
 ;EEPROM =====================================================================
 
+;Read 4066 contact state from EEPROM into R16
+;
 eeprom_read_contacts:
     lds r16, EEPROM_START
+    ret
+
+;Store R16 as the 4066 contact state in the EEPROM
+;
+eeprom_write_contacts:
+    lds r17, NVMCTRL_STATUS
+    sbrc r17, NVMCTRL_EEBUSY_bp ;Skip next if EEPROM is ready
+    rjmp eeprom_write_contacts
+
+    sts EEPROM_START, r16
+
+    ldi r17, NVMCTRL_CMD_PAGEERASEWRITE_gc ;Write EEPROM page command
+    ldi r16, CPU_CCP_SPM_gc
+    out CPU_CCP, r16          ;Unlock NVMCTRL_CTRLA
+    sts NVMCTRL_CTRLA, r17    ;Issue NVMCTRL command
     ret
 
 ;WATCHDOG ===================================================================
