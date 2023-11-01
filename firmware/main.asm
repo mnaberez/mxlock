@@ -26,8 +26,9 @@ previous_keys    = SRAM_START+1 ;State of keys last time around the main loop
 shift_down_ticks = SRAM_START+2 ;Number of ticks Shift Lock has been held down
 
 ;Constants
-TICK_MS         = 20    ;Number of milliseconds in one tick
-RESET_MS        = 50    ;Number of milliseconds to hold /CBMRESET low to reset
+TICK_MS         = 20    ;Milliseconds in one tick
+RESET_MS        = 50    ;Milliseconds to hold /CBMRESET low to reset
+SHIFT_DOWN_MS   = 1500  ;Milliseconds of Shift Lock held down to cause reset
 
 ;Constants for bit positions used with GPIO functions
 KEY_EXTRA       = 3     ;Extra (4066 contact only)
@@ -134,14 +135,14 @@ task_keys:
 task_reset:
     lds r16, current_keys
     lds r17, shift_down_ticks
-    sbrs r16, KEY_SHIFT_LOCK    ;Skip next if Shift Key is down
+    sbrs r16, KEY_SHIFT_LOCK    ;Skip next if Shift Lock is down
     clr r17
     cpi r17, #0xff              ;Cap tick counter (do not wrap to 0)
     breq 1$
     inc r17
 1$: sts shift_down_ticks, r17
 
-    cpi r17, #1500/TICK_MS      ;Held down for >=1500 milliseconds?
+    cpi r17, SHIFT_DOWN_MS/TICK_MS ;Held down long enough to reset?
     brlo 3$
 
     ;Shift Lock held down long enough; it's time to reset the CBM
@@ -205,7 +206,7 @@ read_debounced_keys:
     push r18
     push r17
 
-1$: ldi r18, TICK_MS+1        ;Debounce time
+1$: ldi r18, TICK_MS          ;Debounce time
 2$: rcall wait_1_ms
     rcall gpio_read_keys      ;Returns keys in R16
     cp r16, r17               ;Same as last keys?
