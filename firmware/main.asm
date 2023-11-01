@@ -85,10 +85,8 @@ main_loop:
     rcall read_debounced_keys   ;Read keys (delays 1 tick to debounce)
     sts current_keys, r16
 
-    rcall task_caps_lock        ;Check Caps Lock, update 4066 contacts
-    rcall task_40_80            ;  ... 40/80
-    rcall task_shift_lock       ;  ... Shift Lock
-    rcall task_shift_lock_reset ;Reset computer if Shift Lock is held down
+    rcall task_keys             ;Check keys and update 4066 contacts
+    rcall task_reset            ;Reset computer if Shift Lock is held down
     rcall task_leds             ;Update LEDs
     rcall task_eeprom           ;Store 4066 contacts in EEPROM
 
@@ -105,62 +103,35 @@ main_loop:
 ;tasks can use for timing.
 ;
 
-;Check for Caps Lock keypress
-;Update its 4066 contact on transition from not pressed to pressed
+;Check each key and toggle its 4066 contact if it was just pushed down.
 ;
-task_caps_lock:
-    lds r16, current_keys
+task_keys:
+    ldi r18, 1<<KEY_40_80       ;First key to check (highest bit position)
+
+1$: lds r16, current_keys
+    and r16, r18                ;Leave only key of interest from current
+    breq 2$                     ;Branch if key is not down
+
     lds r17, previous_keys
-    eor r17, r16
-    sbrc r17, KEY_CAPS_LOCK     ;Skip next if Caps Lock has not changed
-    sbrs r16, KEY_CAPS_LOCK     ;Skip next if Caps Lock is down
+    and r17, r18                ;Leave only key of interest from previous
+    eor r17, r16                ;Compare with current state of key
+    breq 2$                     ;Branch if key has not changed
+
+    ;Key has changed and is down
+    rcall gpio_read_contacts
+    eor r16, r18                ;Toggle the 4066 contact
+    rcall gpio_write_contacts
+
+2$: lsr r18                     ;Rotate right to next key
+    brne 1$                     ;Loop until all keys are checked
+
     ret
 
-    ;Caps lock has changed and is down
-    rcall gpio_read_contacts
-    ldi r17, 1<<KEY_CAPS_LOCK
-    eor r16, r17                ;Toggle Caps Lock contact
-    rjmp gpio_write_contacts
-
-;Check for 40/80 keypress
-;Update its 4066 contact on transition from not pressed to pressed
+;Check for reset request and reset CBM if needed
+;If Shift Lock is held down long enough, reset the CBM, restore the
+;previous Shift Lock state, and block until Shift Lock is released.
 ;
-task_40_80:
-    lds r16, current_keys
-    lds r17, previous_keys
-    eor r17, r16
-    sbrc r17, KEY_40_80         ;Skip next if 40/80 has not changed
-    sbrs r16, KEY_40_80         ;Skip next if 40/80 is down
-    ret
-
-    ;40/80 has changed and is down
-    rcall gpio_read_contacts
-    ldi r17, 1<<KEY_40_80
-    eor r16, r17                ;Toggle 40/80 contact
-    rjmp gpio_write_contacts
-
-;Check for Shift Lock keypress
-;Update its 4066 contact on transition from not pressed to pressed
-;
-task_shift_lock:
-    lds r16, current_keys
-    lds r17, previous_keys
-    eor r17, r16
-    sbrc r17, KEY_SHIFT_LOCK     ;Skip next if Shift Lock has not changed
-    sbrs r16, KEY_SHIFT_LOCK     ;Skip next if Shift Lock is down
-    ret
-
-    ;Shift lock has changed and is down
-    rcall gpio_read_contacts
-    ldi r17, 1<<KEY_SHIFT_LOCK
-    eor r16, r17                 ;Toggle Shift Lock contact
-    rjmp gpio_write_contacts
-
-;Check if Shift Lock is being held down
-;If held down long enough, the CBM is reset, the previous Shift Lock
-;state is restored, and the task blocks until the key is released.
-;
-task_shift_lock_reset:
+task_reset:
     lds r16, current_keys
     lds r17, shift_down_ticks
     sbrs r16, KEY_SHIFT_LOCK    ;Skip next if Shift Key is down
