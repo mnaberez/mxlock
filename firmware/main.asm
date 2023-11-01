@@ -240,8 +240,8 @@ wait_n_ms:
 wait_1_ms:
     push r16
     push r17
-    ldi r16, 0x04
-1$: ldi r17, 0xe1
+    ldi r16, 0x05
+1$: ldi r17, 0xde
 2$: dec r17
     brne 2$
     dec r16
