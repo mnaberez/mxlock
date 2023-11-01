@@ -155,7 +155,8 @@ task_shift_lock:
     rjmp gpio_write_contacts
 
 ;Check if Shift Lock is being held down
-;Reset CBM if held down long enough
+;If held down long enough, the CBM is reset, the previous Shift Lock
+;state is restored, and the task blocks until the key is released.
 ;
 task_shift_lock_reset:
     lds r16, current_keys
@@ -168,19 +169,35 @@ task_shift_lock_reset:
 1$: sts shift_down_ticks, r17
 
     cpi r17, #1500/TICK_MS      ;Held down for >=1500 milliseconds?
-    brlo 2$
+    brlo 3$
 
+    ;Shift Lock held down long enough; it's time to reset the CBM
+
+    ;Reset count for next time
+    clr r16
+    sts shift_down_ticks, r16
+
+    ;Restore Shift Lock to its state before being pressed down
+    rcall gpio_read_contacts
+    ldi r17, 1<<KEY_SHIFT_LOCK
+    eor r16, r17
+    rcall gpio_write_contacts
+    rcall gpio_write_leds
+
+    ;Pulse /CBMRESET low
     rcall gpio_cbmreset_on
     ldi r16, RESET_MS
     rcall wait_n_ms
     rcall gpio_cbmreset_off
 
-    clr r16
-    sts shift_down_ticks,r16
-    lds r16, current_keys
-    andi r16, (1<<KEY_SHIFT_LOCK)^0xFF
+    ;Wait for Shift Lock to be released (prevents multiple resets)
+2$: rcall read_debounced_keys
     sts current_keys, r16
-2$: ret
+    wdr
+    sbrc r16, KEY_SHIFT_LOCK
+    rjmp 2$
+
+3$: ret
 
 ;Update the LEDs from the 4066 contacts
 ;
