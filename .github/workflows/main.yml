@@ -24,6 +24,7 @@ jobs:
         make -C firmware MCU=t214
         cat firmware/stevekey_t214_flash.lst
         cat firmware/stevekey_t214_fuses.lst
+        cat firmware/stevekey_t214_eeprom.lst
 
     - name: 'Upload build artifacts'
       uses: actions/upload-artifact@v3
@@ -32,3 +33,4 @@ jobs:
         path: |
             firmware/stevekey_*_flash.*
             firmware/stevekey_*_fuses.*
+            firmware/stevekey_*_eeprom.*
