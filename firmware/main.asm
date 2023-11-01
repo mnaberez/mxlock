@@ -71,9 +71,13 @@ reset:
     rcall wdog_init
     rcall gpio_init
 
-    rcall read_debounced_keys
+    rcall eeprom_read_contacts  ;Read 4066 contacts saved in EEPROM
+    rcall gpio_write_contacts   ;  and restore the 4066 to that state
+
+    ldi r16, 0                  ;Initialize variables to defaults
     sts current_keys, r16
     sts previous_keys, r16
+    sts shift_down_ticks, r16
 
 main_loop:
     wdr                         ;Keep watchdog happy
@@ -393,6 +397,12 @@ gpio_init:
     ldi r16, 1<<3                   ;PB3
     sts PORTB_OUTCLR, r16           ;Set /CBMRESET initially high (0=high)
     sts PORTB_DIRSET, r16           ;Set PB3 as output
+    ret
+
+;EEPROM =====================================================================
+
+eeprom_read_contacts:
+    lds r16, EEPROM_START
     ret
 
 ;WATCHDOG ===================================================================
