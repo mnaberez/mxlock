@@ -3,5 +3,6 @@ gerbers/
 *-lib-table
 stevekey_*_flash*
 stevekey_*_fuses*
+stevekey_*_eeprom*
 *.kical_prl
 *.lck
