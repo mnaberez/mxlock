@@ -164,20 +164,19 @@ task_shift_lock_reset:
 1$: sts shift_down_ticks, r17
 
     cpi r17, #1500/TICK_MS      ;Held down for >=1500 milliseconds?
-    brlo 3$
+    brlo 2$
 
     rcall gpio_cbmreset_on
-    ldi r16, RESET_MS+1
-2$: rcall wait_1ms
-    dec r16
-    brne 2$
+    ldi r16, RESET_MS
+    rcall wait_n_ms
     rcall gpio_cbmreset_off
+
     clr r16
     sts shift_down_ticks,r16
     lds r16, current_keys
     andi r16, (1<<KEY_SHIFT_LOCK)^0xFF
     sts current_keys, r16
-3$: ret
+2$: ret
 
 ;Update the LEDs from the 4066 contacts
 ;
@@ -194,7 +193,7 @@ read_debounced_keys:
     push r17
 
 1$: ldi r18, TICK_MS+1        ;Debounce time
-2$: rcall wait_1ms
+2$: rcall wait_1_ms
     rcall gpio_read_keys      ;Returns keys in R16
     cp r16, r17               ;Same as last keys?
     mov r17, r16              
@@ -207,9 +206,17 @@ read_debounced_keys:
     pop r18
     ret
 
+;Busy wait for N milliseconds in R16
+;
+wait_n_ms:
+    rcall wait_1_ms
+    dec r16
+    brne wait_n_ms
+    ret
+
 ;Busy wait for 1 millisecond
 ;
-wait_1ms:
+wait_1_ms:
     push r16
     push r17
     ldi r16, 0x04
