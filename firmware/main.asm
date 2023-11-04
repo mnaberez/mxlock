@@ -1,4 +1,4 @@
-;ATtiny214
+;ATtiny214/ATtiny414/ATtiny814
 ;1  VCC
 ;2  PA4 out EXTRAOUT to 4066 (0=off, 1=on)
 ;3  PA5 out SLOUT 
@@ -424,31 +424,97 @@ gpio_init:
 
 ;EEPROM =====================================================================
 
+;
+;The EEPROM is used to store the state of the 4066 contacts, which is only
+;1 byte.  However, there are 64 bytes available in the EEPROM on the 
+;ATtiny214 and 128 bytes on the ATTiny414/814.  Since each EEPROM location
+;can only be erased about 100K times, the entire area is used to store the 
+;1 byte using this wear-leveling algorithm:
+;
+; - To write the 4066 contacts byte, the lowest location in the EEPROM that
+;   is erased (0xFF) will receive the byte using the write-only (no erase)
+;   command.  If no location contains 0xFF, the entire EEPROM will be erased
+;   back to 0xFF and the first location will receive the byte.
+;
+; - To read the 4066 contacts byte from the EEPROM, the byte in the highest
+;   location that does not contain 0xFF will be returned.
+;
+;The above algorithm will hopefully allow the 4066 contacts to change
+;64 * 100K (6.4 million) times on the ATtiny214 or 128 * 100K (12.8 million)
+;times on the ATtiny414/814 before the EEPROM wears out.
+;
+
 ;Read 4066 contact state from the EEPROM into R16
+;Destroys Y
+;
+;Find the highest location in the EEPROM that is
+;not erased (0xFF) and return its value.  If the
+;entire EEPROM is empty, return 0 (all contacts off).
 ;
 eeprom_read_contacts:
-    lds r16, EEPROM_START
-    ret
+    ldi YL, <(EEPROM_END+1)
+    ldi YH, >(EEPROM_END+1)
+1$: ld r16, -Y                          ;Load byte currently in EEPROM
+    cpi r16, #0xff                      ;Erased (0xFF)?
+    brne 2$                             ;  Yes: branch to return this byte
+    cpi YL, #<EEPROM_START
+    brne 1$
+    cpi YH, #>EEPROM_START
+    brne 1$
+    ldi r16, 0                          ;EEPROM is empty; return 0 (all off)
+2$: ret
 
 ;Store R16 as the 4066 contact state in the EEPROM
+;Destroys R16, R17, Y
+;
+;Find the lowest location in the EEPROM that is erased (0xFF) and
+;write the value there.  If there is no unerased location, erase
+;the entire EEPROM and write the value in the first location.
 ;
 eeprom_write_contacts:
     rcall eeprom_wait_ready
 
-    sts EEPROM_START, r16
+    ldi YL, <EEPROM_START
+    ldi YH, >EEPROM_START
 
-    ldi r17, NVMCTRL_CMD_PAGEERASEWRITE_gc ;Write EEPROM page command
-    ldi r16, CPU_CCP_SPM_gc
-    out CPU_CCP, r16          ;Unlock NVMCTRL_CTRLA
-    sts NVMCTRL_CTRLA, r17    ;Issue NVMCTRL command
+1$: ld r17, Y+                          ;Load byte currently in EEPROM
+    cpi r17, #0xff                      ;Erased (0xFF)?
+    breq 2$                             ;  Yes: branch to write byte here
+
+    cpi YL, <(EEPROM_END+1)
+    brne 1$
+    cpi YH, >(EEPROM_END+1)
+    brne 1$
+
+    ;No unerased byte; erase EEPROM and reset pointer
+    push r16                            ;Save 4066 contacts
+    ldi r16, NVMCTRL_CMD_EEERASE_gc     ;Erase EEPROM command
+    rcall eeprom_send_cmd
+    pop r16                             ;Recall 4066 contacts
+    ldi YL, <(EEPROM_START+1)
+    ldi YH, <(EEPROM_START+1)
+
+2$: st -Y, r16                          ;Store 4066 contacts in buffer                 
+    ldi r16, NVMCTRL_CMD_PAGEWRITE_gc   ;Write-only command
+
+    ;Fall through
+
+;Send the NVMCTRL command in R16
+;Destroys R17
+;
+eeprom_send_cmd:
+    ldi r17, CPU_CCP_SPM_gc
+    out CPU_CCP, r17                    ;Unlock NVMCTRL_CTRLA
+    sts NVMCTRL_CTRLA, r16              ;Perform EEPROM command in R16
 
     ;Fall through
 
 ;Block until the EEPROM is ready
+;Destroys R17
 ;
 eeprom_wait_ready:
     lds r17, NVMCTRL_STATUS
-    sbrc r17, NVMCTRL_EEBUSY_bp ;Skip next if EEPROM is ready
+    sbrc r17, NVMCTRL_EEBUSY_bp         ;Skip next if EEPROM is ready
     rjmp eeprom_wait_ready
     ret
 

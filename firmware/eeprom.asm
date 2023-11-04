@@ -4,9 +4,6 @@
 .area eeprom (abs, dseg)
 
 .org 0
-.byte 0 ;indicates no keys latched
-
-.nval current_address,.
-.rept (EEPROM_SIZE - current_address)
+.rept EEPROM_SIZE
 .byte 0xFF
 .endm
