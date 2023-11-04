@@ -88,8 +88,8 @@ main_loop:
 
     rcall task_keys             ;Check keys and update 4066 contacts
     rcall task_reset            ;Reset computer if Shift Lock is held down
-    rcall task_leds             ;Update LEDs
     rcall task_eeprom           ;Store 4066 contacts in EEPROM
+    rcall task_leds             ;Update LEDs from 4066 contacts
 
     lds r16, current_keys       
     sts previous_keys, r16      ;Save keys for next time around
@@ -173,12 +173,6 @@ task_reset:
 
 3$: ret
 
-;Update the LEDs from the 4066 contacts
-;
-task_leds:
-    rcall gpio_read_contacts    ;Read 4066 contact states
-    rjmp gpio_write_leds        ;  and update LEDs from them
-
 ;Update 4066 contact state in EEPROM if needed
 ;
 task_eeprom:
@@ -194,9 +188,23 @@ task_eeprom:
 
     ;Contacts do not match the EEPROM, time to write to the EEPROM
 
-    rcall eeprom_write_contacts
+    mov r17, r16                ;Save contacts in R17
+
+    clr r16                     ;Turn off LEDs so that if power is lost,
+    rcall gpio_write_leds       ;  they take no residual power from EEPROM
+
+    mov r16, r17                ;Recall contacts 
+    rcall eeprom_write_contacts 
 
 1$: ret
+
+;Update the LEDs from the 4066 contacts
+;This task should be called last in the main loop because other
+;tasks may temporarily change the state of the LEDs.
+;
+task_leds:
+    rcall gpio_read_contacts    
+    rjmp gpio_write_leds        
 
 ;UTILITIES ==================================================================
 
@@ -411,7 +419,7 @@ gpio_init:
 
 ;EEPROM =====================================================================
 
-;Read 4066 contact state from EEPROM into R16
+;Read 4066 contact state from the EEPROM into R16
 ;
 eeprom_read_contacts:
     lds r16, EEPROM_START
@@ -420,9 +428,7 @@ eeprom_read_contacts:
 ;Store R16 as the 4066 contact state in the EEPROM
 ;
 eeprom_write_contacts:
-    lds r17, NVMCTRL_STATUS
-    sbrc r17, NVMCTRL_EEBUSY_bp ;Skip next if EEPROM is ready
-    rjmp eeprom_write_contacts
+    rcall eeprom_wait_ready
 
     sts EEPROM_START, r16
 
@@ -430,6 +436,15 @@ eeprom_write_contacts:
     ldi r16, CPU_CCP_SPM_gc
     out CPU_CCP, r16          ;Unlock NVMCTRL_CTRLA
     sts NVMCTRL_CTRLA, r17    ;Issue NVMCTRL command
+
+    ;Fall through
+
+;Block until the EEPROM is ready
+;
+eeprom_wait_ready:
+    lds r17, NVMCTRL_STATUS
+    sbrc r17, NVMCTRL_EEBUSY_bp ;Skip next if EEPROM is ready
+    rjmp eeprom_wait_ready
     ret
 
 ;WATCHDOG ===================================================================
