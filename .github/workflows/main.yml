@@ -26,6 +26,20 @@ jobs:
         cat firmware/stevekey_t214_fuses.lst
         cat firmware/stevekey_t214_eeprom.lst
 
+    - name: Build the firmware (ATtiny414 version)
+      run: |
+        make -C firmware MCU=t414
+        cat firmware/stevekey_t414_flash.lst
+        cat firmware/stevekey_t414_fuses.lst
+        cat firmware/stevekey_t414_eeprom.lst
+
+    - name: Build the firmware (ATtiny814 version)
+      run: |
+        make -C firmware MCU=t814
+        cat firmware/stevekey_t814_flash.lst
+        cat firmware/stevekey_t814_fuses.lst
+        cat firmware/stevekey_t814_eeprom.lst
+
     - name: 'Upload build artifacts'
       uses: actions/upload-artifact@v3
       with:

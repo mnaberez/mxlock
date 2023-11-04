@@ -1,6 +1,5 @@
 
-;Definitions file "tn214def.asm"
-;will be included first by the Makefile.
+;Definitions file will be included first by the Makefile.
 
 .area eeprom (abs, dseg)
 

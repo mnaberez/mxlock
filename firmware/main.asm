@@ -14,11 +14,11 @@
 ;13 PA3 out 4080LED 
 ;14 GND
 
-    ;Definitions file "tn214def.asm"
-    ;will be included first by the Makefile.
+    ;Definitions file will be included first by the Makefile.
 
     .area code (abs)
     .list (me)
+    .32bit
 
 ;RAM
 current_keys     = SRAM_START+0 ;Current state of keys
@@ -42,7 +42,7 @@ KEY_SHIFT_LOCK  = 0     ;Shift Lock key / LED / 4066 contact
 
     ;All interrupt vectors jump to fatal error (interrupts are not used)
     .rept INT_VECTORS_SIZE - 1
-    rjmp fatal
+    rjmp jmp_fatal
     .endm
 
     ;Code starts at first location after vectors
@@ -57,7 +57,7 @@ reset:
     ld r16, Z+                ;Read it back, increment Z
     tst r16                   ;Did it read back as 0?
     breq 2$                   ;Yes: continue clearing
-    rjmp fatal                ;No: hardware failure, jump to fatal
+    jmp fatal                 ;No: hardware failure, jump to fatal
 2$: cpi ZL, <(INTERNAL_SRAM_END+1)
     brne 1$
     cpi ZH, >(INTERNAL_SRAM_END+1)
@@ -250,6 +250,11 @@ wait_1_ms:
     pop r17
     pop r16
     ret
+
+;Work around RJMP range limitation
+;
+jmp_fatal:
+    jmp fatal
 
 ;GPIO =======================================================================
 
@@ -458,12 +463,12 @@ wdog_init:
     andi r16, WDT_PERIOD_gm
     cpi r16, WDT_PERIOD_4KCLK_gc      ;Watchdog period set by the fuses?
     breq 1$                           ;Yes: continue
-    rjmp fatal                        ;No: bad fuses, jump to fatal
+    jmp fatal                         ;No: bad fuses, jump to fatal
 
     ;Ensure watchdog is locked so it can't be stopped
 1$: lds r16, WDT_STATUS
     sbrs r16, WDT_LOCK_bp             ;Skip fatal if locked
-    rjmp fatal
+    jmp fatal
 
     wdr                               ;Reset watchdog timer
     ret
