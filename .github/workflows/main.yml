@@ -25,15 +25,15 @@ jobs:
     - name: Build the firmware (${{ matrix.mcu }} version)
       run: |
         make -C firmware MCU=${{ matrix.mcu }}
-        cat firmware/stevekey_${{ matrix.mcu }}_flash.lst
-        cat firmware/stevekey_${{ matrix.mcu }}_fuses.lst
-        cat firmware/stevekey_${{ matrix.mcu }}_eeprom.lst
+        cat firmware/mxlock_${{ matrix.mcu }}_flash.lst
+        cat firmware/mxlock_${{ matrix.mcu }}_fuses.lst
+        cat firmware/mxlock_${{ matrix.mcu }}_eeprom.lst
 
     - name: 'Upload build artifacts'
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts-${{ matrix.mcu }}
         path: |
-            firmware/stevekey_${{ matrix.mcu }}_flash.*
-            firmware/stevekey_${{ matrix.mcu }}_fuses.*
-            firmware/stevekey_${{ matrix.mcu }}_eeprom.*
+            firmware/mxlock_${{ matrix.mcu }}_flash.*
+            firmware/mxlock_${{ matrix.mcu }}_fuses.*
+            firmware/mxlock_${{ matrix.mcu }}_eeprom.*

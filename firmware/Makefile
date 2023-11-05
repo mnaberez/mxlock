@@ -1,4 +1,4 @@
-PROJECT=stevekey
+PROJECT=mxlock
 MCU=t214
 ISPFLAGS=-c atmelice_updi
 

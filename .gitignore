@@ -1,8 +1,8 @@
-stevekey-backups/
+mxlock-backups/
 gerbers/
 *-lib-table
-stevekey_*_flash*
-stevekey_*_fuses*
-stevekey_*_eeprom*
+mxlock_*_flash*
+mxlock_*_fuses*
+mxlock_*_eeprom*
 *.kical_prl
 *.lck
