@@ -13,7 +13,7 @@ The printed circuit board was designed using KiCad.  The [schematic](./schematic
 | [1x6 2.54mm Male Header](https://www.mouser.com/ProductDetail/649-1012937890604BLF) | 1 | J2 |
 | [1x2 2.54mm Male Header](https://www.mouser.com/ProductDetail/649-1012937890201BLF) | 3 | J3, J4, J5 |
 | [2N3904 Transistor](https://www.mouser.com/ProductDetail/512-2N3904BU) | 1 | Q1 |
-| [10K 1/4W Resistor](https://www.mouser.com/ProductDetail/603-MFR-25FTE52-10K) | 3 | R1, R2, R3 |
+| ~~[10K 1/4W Resistor](https://www.mouser.com/ProductDetail/603-MFR-25FTE52-10K)~~ | ~~3~~ | ~~R1, R2, R3~~ Removed in Rev 2 |
 | [1K 1/4W Resistor](https://www.mouser.com/ProductDetail/603-MFR-25FTF52-1K) | 1 | R7 |
 | [330 ohm 1/4W Resistor](https://www.mouser.com/ProductDetail/603-MFR-25FTE52-330R) | 3 | R4, R5, R6 |
 | [MX-Compatible Keyboard Switch](https://www.amazon.com/dp/B07K7J38SB) | 3 | SW1, SW2, SW3 |

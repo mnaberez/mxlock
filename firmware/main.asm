@@ -406,6 +406,11 @@ gpio_init:
     ldi r16, 1<<2 | 1<<1 | 1<<0     ;PB2, PB1, PB0
     sts PORTB_DIRCLR, r16           ;Set pins as input
 
+    ldi r16, PORT_PULLUPEN_bm       ;Pull-up enabled, other features disabled
+    sts PORTB_PIN2CTRL, r16         ; on PB2
+    sts PORTB_PIN1CTRL, r16         ; on PB1
+    sts PORTB_PIN0CTRL, r16         ; on PB0
+
     ;4066 Outputs
     ldi r16, 1<<7 | 1<<6 | 1<<5 | 1<<4  ;PA7, PA6, PA5, PA4
     sts PORTA_OUTCLR, r16           ;Set 4066s initially off (0=off)
