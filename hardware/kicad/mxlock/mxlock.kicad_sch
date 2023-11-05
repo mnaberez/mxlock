@@ -1152,7 +1152,7 @@
         )
       )
     )
-    (symbol "stevekey:ATMEL-ICE-10" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
+    (symbol "mxlock:ATMEL-ICE-10" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
       (property "Reference" "J" (at -8.89 13.97 0)
         (effects (font (size 1.27 1.27)) (justify left))
       )
@@ -1800,7 +1800,7 @@
     )
     (pin "1" (uuid c530849a-3e0c-4d8b-9c2f-8df3575bd86f))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR011") (unit 1)
         )
@@ -1838,7 +1838,7 @@
     (pin "14" (uuid 75002a39-af26-45e6-9498-27335cb5cce7))
     (pin "7" (uuid c6e9c688-b48c-4f84-aa02-b80b1edd19e1))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "U1") (unit 1)
         )
@@ -1863,7 +1863,7 @@
     )
     (pin "1" (uuid 65d24956-acd0-4c13-a2e3-6513153bbc77))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR04") (unit 1)
         )
@@ -1888,7 +1888,7 @@
     )
     (pin "1" (uuid d5675e16-eabb-46bd-98ba-adee520084b6))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR013") (unit 1)
         )
@@ -1914,7 +1914,7 @@
     (pin "1" (uuid 8c170a2c-2ea8-48f3-82f7-b6caf0a807a8))
     (pin "2" (uuid 57940bfa-24f5-49a5-9595-6e15b8641622))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "D2") (unit 1)
         )
@@ -1939,7 +1939,7 @@
     )
     (pin "1" (uuid 6d02e8c7-1340-4834-afb1-3c5f68b7e48d))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR08") (unit 1)
         )
@@ -1964,7 +1964,7 @@
     )
     (pin "1" (uuid 1e2ca215-381a-475b-814f-fbd90c34c1cb))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR02") (unit 1)
         )
@@ -1990,7 +1990,7 @@
     (pin "1" (uuid ebd99540-f102-42a0-821e-8dc3d46dde3a))
     (pin "2" (uuid 282dbb87-1d85-441a-bca6-36ad210debaf))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "R7") (unit 1)
         )
@@ -2028,7 +2028,7 @@
     (pin "14" (uuid 727133f0-35bf-49d6-a7d0-6b401ee3f2e3))
     (pin "7" (uuid 7f5564e4-201f-4473-8847-977f76781270))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "U1") (unit 3)
         )
@@ -2066,7 +2066,7 @@
     (pin "8" (uuid 50d98ef6-87c5-45e1-8bca-d093354c77ec))
     (pin "9" (uuid 79354589-1aa9-4960-8885-fd889a2754d4))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "U2") (unit 1)
         )
@@ -2092,7 +2092,7 @@
     (pin "1" (uuid 1404e85a-9468-465c-8bd1-c7279bd720f5))
     (pin "2" (uuid c7d941f2-1998-41d6-9e84-d59d864dfd19))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "R6") (unit 1)
         )
@@ -2118,7 +2118,7 @@
     (pin "1" (uuid 213bb4ad-e571-4e26-8470-dc25e70fde31))
     (pin "2" (uuid bbe2ee2c-dea0-4253-9dfd-a43be1098e60))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "C3") (unit 1)
         )
@@ -2143,7 +2143,7 @@
     )
     (pin "1" (uuid 91b944f4-6373-48fc-810e-1c7a335d418a))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR09") (unit 1)
         )
@@ -2168,7 +2168,7 @@
     )
     (pin "1" (uuid 34e810ea-2d33-411a-9990-d3e98ef33989))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR05") (unit 1)
         )
@@ -2194,7 +2194,7 @@
     (pin "1" (uuid f36f02e8-b4fc-4627-860e-0f555ce4080d))
     (pin "2" (uuid 26aa52f3-e8fa-4035-8e3c-1e46fdc2586b))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "SW3") (unit 1)
         )
@@ -2232,7 +2232,7 @@
     (pin "14" (uuid 0b5a41bc-0d45-490c-82b5-25c3be161d61))
     (pin "7" (uuid 703b3e08-50ff-4478-93ce-07690407dc05))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "U1") (unit 2)
         )
@@ -2258,7 +2258,7 @@
     (pin "1" (uuid b7868315-36a1-4a25-adab-abe0cc6b8187))
     (pin "2" (uuid 048ba549-f1cf-44fa-b0a6-d07303c3a25c))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "SW2") (unit 1)
         )
@@ -2266,7 +2266,7 @@
     )
   )
 
-  (symbol (lib_id "stevekey:ATMEL-ICE-10") (at 190.5 44.45 0) (unit 1)
+  (symbol (lib_id "mxlock:ATMEL-ICE-10") (at 190.5 44.45 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7d445168-ff56-43ae-a69c-e1f0c68c2457)
     (property "Reference" "J1" (at 210.82 26.67 0)
@@ -2275,7 +2275,7 @@
     (property "Value" "ATMEL-ICE-10" (at 210.82 29.21 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "stevekey:PinHeader_2x05_P1.27mm_Shrouded_Vertical_SMD_Handsolder" (at 186.69 40.64 90)
+    (property "Footprint" "mxlock:PinHeader_2x05_P1.27mm_Shrouded_Vertical_SMD_Handsolder" (at 186.69 40.64 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" " ~" (at 158.115 58.42 0)
@@ -2291,7 +2291,7 @@
     (pin "8" (uuid 880908ff-54ab-4595-8067-d03bf20a6ba2))
     (pin "9" (uuid ae0ab59c-a33b-4e3b-957a-97fdd9cede0f))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "J1") (unit 1)
         )
@@ -2316,7 +2316,7 @@
     )
     (pin "1" (uuid 4af405b7-68f1-45d2-a777-f5bd64e477fc))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR012") (unit 1)
         )
@@ -2341,7 +2341,7 @@
     )
     (pin "1" (uuid 4488ca9f-f76f-4f3a-b2f2-2c5f38ab71f1))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR06") (unit 1)
         )
@@ -2366,7 +2366,7 @@
     )
     (pin "1" (uuid 0a82bcfd-ad0a-45b3-903f-4645aa14f18d))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR03") (unit 1)
         )
@@ -2393,7 +2393,7 @@
     (pin "2" (uuid ffa7d8d7-bab1-49ea-8a8e-dd482b1a4c28))
     (pin "3" (uuid 550dff11-fd13-4072-9090-d52f63f6a144))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "Q1") (unit 1)
         )
@@ -2419,7 +2419,7 @@
     (pin "1" (uuid 3e583ac2-0b25-4d30-9563-454e72ad5f55))
     (pin "2" (uuid e70862ac-a97f-43ab-9996-c2493f076bb2))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "C2") (unit 1)
         )
@@ -2445,7 +2445,7 @@
     (pin "1" (uuid b8401bd3-e983-4911-a721-1dbb4c03ffaa))
     (pin "2" (uuid b748557d-e9c9-44c5-9089-c51311287842))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "D1") (unit 1)
         )
@@ -2471,7 +2471,7 @@
     (pin "1" (uuid ef768239-4163-4afa-b281-653fbb32c5e5))
     (pin "2" (uuid ed22de74-41a8-4afe-b8e6-e0b2be8d4655))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "C1") (unit 1)
         )
@@ -2496,7 +2496,7 @@
     )
     (pin "1" (uuid c5950b69-4391-4822-86c0-bf190b15dd0a))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR01") (unit 1)
         )
@@ -2522,7 +2522,7 @@
     (pin "1" (uuid 3d819eae-010a-4a46-ad7b-82f57cbb8478))
     (pin "2" (uuid 6421aa07-5ec3-4e0b-a289-ebf9615b5028))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "R4") (unit 1)
         )
@@ -2548,7 +2548,7 @@
     (pin "1" (uuid aca6ce95-c96d-4870-a462-26004a937927))
     (pin "2" (uuid 204c24d1-c59c-4351-a5b6-0ad1e18b177a))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "R5") (unit 1)
         )
@@ -2574,7 +2574,7 @@
     (pin "1" (uuid be13425c-de76-4f6d-b549-05da392c82ff))
     (pin "2" (uuid 8cc262a8-79d7-47c6-a26b-912a5e7726a3))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "J4") (unit 1)
         )
@@ -2600,7 +2600,7 @@
     (pin "1" (uuid 0df4a2e5-4149-4cb2-a6ed-90cac8a7daa0))
     (pin "2" (uuid 4b404023-f178-4af5-a333-09e42eb8c5a1))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "SW1") (unit 1)
         )
@@ -2626,7 +2626,7 @@
     (pin "1" (uuid 66fff775-5fb7-4a94-9e56-5ab220c0f4c5))
     (pin "2" (uuid c49d6aad-b4c0-4e1b-9dcc-54f96520ffeb))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "J3") (unit 1)
         )
@@ -2656,7 +2656,7 @@
     (pin "5" (uuid 3991373b-770d-4ded-81f8-d7ddc0fac647))
     (pin "6" (uuid 4b3aec3f-e4e5-47b1-86ab-796d92894e4b))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "J2") (unit 1)
         )
@@ -2682,7 +2682,7 @@
     (pin "1" (uuid 0c68beeb-d411-4f47-af78-15627fe748b2))
     (pin "2" (uuid 52cd5687-6398-4f63-bb11-5811c370d45b))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "D3") (unit 1)
         )
@@ -2708,7 +2708,7 @@
     (pin "1" (uuid 9cc85189-2266-4888-9914-93f3b635aa7b))
     (pin "2" (uuid 005fa45d-9ca3-46ba-8a77-0f6740154475))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "J5") (unit 1)
         )
@@ -2746,7 +2746,7 @@
     (pin "14" (uuid 2e2708d6-8770-4700-864d-8e67fa04d92f))
     (pin "7" (uuid 5dacc1b0-d775-4a7e-a2f1-b040bee872e2))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "U1") (unit 5)
         )
@@ -2784,7 +2784,7 @@
     (pin "14" (uuid 48d22227-7fb3-44d3-8899-07962c368d2c))
     (pin "7" (uuid a02cecea-675f-49ac-a7e8-03b345c9d473))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "U1") (unit 4)
         )
@@ -2809,7 +2809,7 @@
     )
     (pin "1" (uuid d4eb58f5-8641-4221-9d2f-35b054a09271))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR07") (unit 1)
         )
@@ -2834,7 +2834,7 @@
     )
     (pin "1" (uuid 7f08d6c3-380b-4b37-8ca0-09cfecb26da2))
     (instances
-      (project "stevekey"
+      (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
           (reference "#PWR010") (unit 1)
         )
