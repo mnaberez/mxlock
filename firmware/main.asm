@@ -1,17 +1,17 @@
 ;ATtiny214/ATtiny414/ATtiny814
 ;1  VCC
-;2  PA4 out EXTRAOUT to 4066 (0=off, 1=on)
-;3  PA5 out SLOUT 
-;4  PA6 out CAPSOUT 
-;5  PA7 out 4080OUT 
-;6  PB3 out /CBMRESET (0=/CBMRESET=open, 1=/CBMRESET=low)
+;2  PA4 out EXTRAOUT to 4066 and EXTRALED (0=off, 1=on)
+;3  PA5 out SLOUT to 4066 (0=off, 1=on)
+;4  PA6 out CAPSOUT to 4066 (0=off, 1=on)
+;5  PA7 out 4080OUT to 4066 (0=off, 1=on)
+;6  PB3 out CBMRESETOUT (0=/CBMRESET=open, 1=/CBMRESET=low)
 ;7  PB2 in 4080KEY (0=down, 1=up)
-;8  PB1 in CAPSKEY 
-;9  PB0 in SLKEY 
-;10 UPDI
-;11 PA1 out SLLED (0=on, 1=off)
-;12 PA2 out CAPSLED
-;13 PA3 out 4080LED 
+;8  PB1 in CAPSKEY (0=down, 1=up)
+;9  PB0 in SLKEY   (0=down, 1=up)
+;10 UPDI/PA0 in EXTRAKEY (0=down, 1=up)
+;11 PA1 out SLLED   (0=on, 1=off)
+;12 PA2 out CAPSLED (0=on, 1=off)
+;13 PA3 out 4080LED (0=on, 1=off)
 ;14 GND
 
     ;Definitions file will be included first by the Makefile.
@@ -107,7 +107,7 @@ main_loop:
 ;Check each key and toggle its 4066 contact if it was just pushed down.
 ;
 task_keys:
-    ldi r18, 1<<KEY_40_80       ;First key to check (highest bit position)
+    ldi r18, 1<<KEY_EXTRA       ;First key to check (highest bit position)
 
 1$: lds r16, current_keys
     and r16, r18                ;Leave only key of interest from current
@@ -274,16 +274,21 @@ jmp_fatal:
 ;
 gpio_read_keys:
     push r17
-    lds r17, PORTB_IN
 
-    ;Convert PORTB_OUT bits to R16 bits
     clr r16
+
+    lds r17, PORTA_IN
+    sbrs r17, 0                 ;UPDI/PA0 clear
+    ori r16, 1<<KEY_EXTRA       ;  sets EXTRA bit
+
+    lds r17, PORTB_IN
     sbrs r17, 2                 ;PB2 clear
     ori r16, 1<<KEY_40_80       ;  sets 40/80 bit
     sbrs r17, 1                 ;PB1 clear
     ori r16, 1<<KEY_CAPS_LOCK   ;  sets Caps Lock bit
     sbrs r17, 0                 ;PB0 clear
     ori r16, 1<<KEY_SHIFT_LOCK  ;  sets Shift Lock bit
+
     pop r17
     ret
 
@@ -294,18 +299,16 @@ gpio_write_contacts:
     push r16
     push r17
 
-    ;Convert R16 bits to PORTA_OUT bits
     clr r17
+    sbrc r16, KEY_EXTRA
+    ori r17, 1<<4               ;Extra bit set sets PA4
     sbrc r16, KEY_SHIFT_LOCK    
     ori r17, 1<<5               ;Shift Lock bit set sets PA5
     sbrc r16, KEY_CAPS_LOCK     
     ori r17, 1<<6               ;Caps Lock bit set sets PA6
     sbrc r16, KEY_40_80         
     ori r17, 1<<7               ;40/80 bit set sets PA7
-    sbrc r16, KEY_EXTRA         
-    ori r17, 1<<4               ;Extra bit set sets PA4
 
-    ;Set/clear bits in PORTA_OUT
     lds r16, PORTA_OUT
     andi r16, 0xff ^ (1<<7 | 1<<6 | 1<<5 | 1<<4)
     or r16, r17
@@ -322,16 +325,15 @@ gpio_read_contacts:
     push r17
     lds r17, PORTA_OUT
 
-    ;Convert PORTA_OUT bits to R16 bits
     clr r16
+    sbrc R17, 4                 
+    ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
     sbrc r17, 5                 
     ori r16, 1<<KEY_SHIFT_LOCK  ;PA5 set sets Shift Lock bit
     sbrc r17, 6                 
     ori r16, 1<<KEY_CAPS_LOCK   ;PA6 set sets Caps Lock bit
     sbrc r17, 7                 
     ori r16, 1<<KEY_40_80       ;PA7 set sets 40/80 bit
-    sbrc R17, 4                 
-    ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
 
     pop r17
     ret
@@ -343,7 +345,6 @@ gpio_write_leds:
     push r16 
     push r17
 
-    ;Convert R16 bits to PORTA_OUT bits
     clr r17
     sbrs r16, KEY_SHIFT_LOCK    
     ori r17, 1<<1               ;Shift Lock bit clear sets PA1
@@ -352,7 +353,9 @@ gpio_write_leds:
     sbrs r16, KEY_40_80         
     ori r17, 1<<3               ;40/80 bit clear sets PA3
 
-    ;Set/clear bits in PORTA_OUT
+    ;Note: The LED for KEY_EXTRA is different.  It's ignored
+    ;here because it's on whenever its 4066 contact is on.
+
     lds r16, PORTA_OUT
     andi r16, 0xff ^ (1<<3 | 1<<2 | 1<<1)    
     or r16, r17
@@ -367,16 +370,22 @@ gpio_write_leds:
 ;
 gpio_read_leds:
     push r17
-    lds r17, PORTA_OUT
 
-    ;Convert PORTA_OUT bits to R16
     clr r16
-    sbrs r17, 3                 
-    ori r16, 1<<KEY_40_80       ;PA3 clear sets 40/80 bit
-    sbrs r17, 2                 
-    ori r16, 1<<KEY_CAPS_LOCK   ;PA2 clear sets Caps Lock bit
+
+    lds r17, PORTA_OUT
     sbrs r17, 1                 
     ori r16, 1<<KEY_SHIFT_LOCK  ;PA1 clear sets Shift Lock bit
+    sbrs r17, 2
+    ori r16, 1<<KEY_CAPS_LOCK   ;PA2 clear sets Caps Lock bit
+    sbrs r17, 3
+    ori r16, 1<<KEY_40_80       ;PA3 clear sets 40/80 bit
+
+    ;Note: The LED for KEY_EXTRA is different.  It's on whenever
+    ;its 4066 contact is on, so the 4066 contact is tested here.
+
+    sbrc R17, 4
+    ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
 
     pop r17
     ret
@@ -397,6 +406,7 @@ gpio_cbmreset_off:
 
 ;Set initial GPIO directions and states
 ;
+; - Key pins as inputs
 ; - LED pins as outputs; LEDs not lit
 ; - 4066 pins as outputs; contacts open
 ; - /CBMRESET pin as output; /CBMRESET=open
@@ -410,6 +420,17 @@ gpio_init:
     sts PORTB_PIN2CTRL, r16         ; on PB2
     sts PORTB_PIN1CTRL, r16         ; on PB1
     sts PORTB_PIN0CTRL, r16         ; on PB0
+
+    ;UPDI/PA0 Key Input
+    ldi r16, 1<<0                   ;UPDI/PA0
+    sts PORTA_DIRCLR, r16           ;Set UPDI pin also as a GPIO input
+    clr r16
+    sts PORTA_PIN0CTRL, r16         ;No pull-up or other features on PA0
+
+    ;Note: The UPDI/PA0 pin is configured for UPDI in the fuses.  In UPDI
+    ;mode, the pin can still be used as an input.  The MCU can still be
+    ;programmed with UPDI as long as the key is not pressed down.  No pull-up
+    ;is configured because UPDI mode has its own special pull-up.
 
     ;4066 Outputs
     ldi r16, 1<<7 | 1<<6 | 1<<5 | 1<<4  ;PA7, PA6, PA5, PA4
