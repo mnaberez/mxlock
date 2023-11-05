@@ -10,7 +10,7 @@ Stevekey solves this problem by allowing regular momentary MX keys to be used fo
 
 Features:
 
- - Simulates up to 3 latching keys using an [ATtiny214](https://web.archive.org/web/20231029180615if_/https://ww1.microchip.com/downloads/en/DeviceDoc/40001912A.pdf) and a [4066](https://web.archive.org/web/20231029180910if_/https://www.ti.com/lit/ds/symlink/cd4066b-mil.pdf)
+ - Simulates up to 3 latching keys using an [ATtiny214/414/814](https://web.archive.org/web/20231029180615if_/https://ww1.microchip.com/downloads/en/DeviceDoc/40001912A.pdf) and a [4066](https://web.archive.org/web/20231029180910if_/https://www.ti.com/lit/ds/symlink/cd4066b-mil.pdf)
  - Shows the on/off state of each key with LEDs
  - Remembers the latch states between power cycles (useful for `40/80`)
  - Resets the computer by pulling `/RESET` low if `SHIFT LOCK` is held down

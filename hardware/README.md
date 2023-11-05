@@ -18,4 +18,6 @@ The printed circuit board was designed using KiCad.  The [schematic](./schematic
 | [150 ohm 1/4W Resistor](https://www.mouser.com/ProductDetail/603-MFR-25FTE52-150R) | 3 | R4, R5, R6 |
 | [MX-Compatible Keyboard Switch](https://www.amazon.com/dp/B07K7J38SB) | 3 | SW1, SW2, SW3 |
 | [CD4066BM](https://www.mouser.com/ProductDetail/595-CD4066BM96) | 1 | U1 |
-| [ATtiny214-SS](https://www.mouser.com/ProductDetail/579-ATTINY214-SSN) | 1 | U2 |
+| [ATtiny414-SSN](https://www.mouser.com/ProductDetail/579-ATTINY414-SSN) | 1 | U2 |
+
+Note: The ATtiny214, ATtiny414, and ATtiny814 are all supported.  Although any of these can be used, the ATtiny414 and ATtiny814 are preferred because they have twice the EEPROM space (128 bytes) as the ATtiny214 (64 bytes).  The firmware uses a wear-leveling algorithm that spreads writes across the EEPROM locations, so the ATtiny414 and ATtiny814 should last twice as long as the ATtiny214.
