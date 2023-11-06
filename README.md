@@ -2,11 +2,11 @@
 
 [![Photo](./hardware/photos/board.jpg)](./hardware/photos/board.jpg)
 
-This is microcontroller circuit used to simulate latching keys on Steve Gray's [Cherry MX replacement keyboards](http://6502.org/users/sjgray/projects/mxkeyboards/) for 8-bit Commodore computers.
+This microcontroller circuit is used to simulate latching keys on Steve Gray's [Cherry MX replacement keyboards](http://6502.org/users/sjgray/projects/mxkeyboards/) for 8-bit Commodore computers.
 
 Many Commmodore keyboards have a mechanically latching key for `SHIFT LOCK`.  The Commodore 128 has three latching keys: `SHIFT LOCK`, `CAPS LOCK`, and `40/80`.  This is a problem for Cherry MX projects because mechanically latching MX keys are difficult to find and expensive.  
 
-Mxlock solves this problem by allowing regular momentary MX keys to be used for up to 3 latching keys.  It simulates the latching action so users can preserve their 40/80 mode or EFFICIENTLY YELL at others online again, just like they could with their original Commodore keyboards.
+MXLock solves this problem by allowing regular momentary MX keys to be used for up to 3 latching keys.  It simulates the latching action so users can preserve their 40/80 mode or EFFICIENTLY YELL at others online again, just like they could with their original Commodore keyboards.
 
 Features:
 
