@@ -1804,7 +1804,7 @@
   (symbol (lib_id "Analog_Switch:CD4066BM") (at 44.45 140.97 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0fe45500-640c-4250-bf5b-ca615752f745)
-    (property "Reference" "U1" (at 44.45 133.35 0)
+    (property "Reference" "U2" (at 44.45 133.35 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "CD4066BM" (at 44.45 135.89 0)
@@ -1833,7 +1833,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "U1") (unit 1)
+          (reference "U2") (unit 1)
         )
       )
     )
@@ -1993,7 +1993,7 @@
   (symbol (lib_id "Device:R_Small_US") (at 189.23 86.36 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3967f3a1-d273-45e0-b926-0e8d76a1f8c3)
-    (property "Reference" "R7" (at 189.23 90.17 90)
+    (property "Reference" "R6" (at 189.23 90.17 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1K" (at 189.23 92.71 90)
@@ -2010,7 +2010,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "R7") (unit 1)
+          (reference "R6") (unit 1)
         )
       )
     )
@@ -2019,7 +2019,7 @@
   (symbol (lib_id "Analog_Switch:CD4066BM") (at 168.91 140.97 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3a6f3a5f-21bc-4c94-9780-a636e44bf3d0)
-    (property "Reference" "U1" (at 168.91 133.35 0)
+    (property "Reference" "U2" (at 168.91 133.35 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "CD4066BM" (at 168.91 135.89 0)
@@ -2048,7 +2048,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "U1") (unit 3)
+          (reference "U2") (unit 3)
         )
       )
     )
@@ -2057,7 +2057,7 @@
   (symbol (lib_id "MCU_Microchip_ATtiny:ATtiny214-SS") (at 97.79 63.5 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3ddfcf7c-12af-4e53-879d-415303ea0435)
-    (property "Reference" "U2" (at 99.9841 43.18 0)
+    (property "Reference" "U1" (at 99.9841 43.18 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "ATtiny214/414/814" (at 99.9841 45.72 0)
@@ -2086,7 +2086,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "U2") (unit 1)
+          (reference "U1") (unit 1)
         )
       )
     )
@@ -2095,7 +2095,7 @@
   (symbol (lib_id "Device:R_Small_US") (at 254 125.73 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4159be99-786b-4b58-968f-84f6b53cc1a3)
-    (property "Reference" "R2" (at 257.81 124.46 0)
+    (property "Reference" "R5" (at 257.81 124.46 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1K" (at 257.81 127 0)
@@ -2112,7 +2112,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "R2") (unit 1)
+          (reference "R5") (unit 1)
         )
       )
     )
@@ -2121,7 +2121,7 @@
   (symbol (lib_id "Device:R_Small_US") (at 149.86 43.18 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 49589160-21d6-47ff-859b-1c310c6f7c31)
-    (property "Reference" "R6" (at 152.4 41.91 0)
+    (property "Reference" "R3" (at 152.4 41.91 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 152.4 44.45 0)
@@ -2138,7 +2138,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "R6") (unit 1)
+          (reference "R3") (unit 1)
         )
       )
     )
@@ -2274,7 +2274,7 @@
   (symbol (lib_id "Analog_Switch:CD4066BM") (at 105.41 140.97 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 6cf8325b-1365-43fe-97f2-203862ba51f2)
-    (property "Reference" "U1" (at 105.41 133.35 0)
+    (property "Reference" "U2" (at 105.41 133.35 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "CD4066BM" (at 105.41 135.89 0)
@@ -2303,7 +2303,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "U1") (unit 2)
+          (reference "U2") (unit 2)
         )
       )
     )
@@ -2338,7 +2338,7 @@
   (symbol (lib_id "mxlock:ATMEL-ICE-10") (at 189.23 48.26 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7d445168-ff56-43ae-a69c-e1f0c68c2457)
-    (property "Reference" "J1" (at 209.55 30.48 0)
+    (property "Reference" "J6" (at 209.55 30.48 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "ATMEL-ICE-10" (at 209.55 33.02 0)
@@ -2362,7 +2362,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "J1") (unit 1)
+          (reference "J6") (unit 1)
         )
       )
     )
@@ -2421,7 +2421,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 231.14 121.92 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8cc5f60f-71fe-44ff-8144-e0abf3aea3ae)
-    (property "Reference" "J6" (at 236.22 120.65 90)
+    (property "Reference" "J4" (at 236.22 120.65 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Conn_01x02" (at 236.22 123.19 90)
@@ -2438,7 +2438,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "J6") (unit 1)
+          (reference "J4") (unit 1)
         )
       )
     )
@@ -2577,7 +2577,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x04") (at 227.33 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b471d169-2a46-4780-99af-0eef6157d88b)
-    (property "Reference" "J2" (at 233.68 60.96 0)
+    (property "Reference" "J5" (at 233.68 60.96 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Conn_01x04" (at 228.6 63.5 0)
@@ -2596,7 +2596,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "J2") (unit 1)
+          (reference "J5") (unit 1)
         )
       )
     )
@@ -2682,7 +2682,7 @@
   (symbol (lib_id "Device:R_Small_US") (at 129.54 43.18 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c3fe19f5-6cdf-44d7-a37f-5d475203e0b4)
-    (property "Reference" "R4" (at 132.08 41.91 0)
+    (property "Reference" "R1" (at 132.08 41.91 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 132.08 44.45 0)
@@ -2699,7 +2699,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "R4") (unit 1)
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -2708,7 +2708,7 @@
   (symbol (lib_id "Device:R_Small_US") (at 139.7 43.18 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c622d54b-ddc4-4a64-8866-e4601611c139)
-    (property "Reference" "R5" (at 142.24 41.91 0)
+    (property "Reference" "R2" (at 142.24 41.91 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 142.24 44.45 0)
@@ -2725,7 +2725,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "R5") (unit 1)
+          (reference "R2") (unit 1)
         )
       )
     )
@@ -2734,7 +2734,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 104.14 124.46 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c996a8e6-07d3-4cd9-a105-2acc4033f76d)
-    (property "Reference" "J4" (at 109.22 123.19 90)
+    (property "Reference" "J2" (at 109.22 123.19 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Conn_01x02" (at 109.22 125.73 90)
@@ -2751,7 +2751,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "J4") (unit 1)
+          (reference "J2") (unit 1)
         )
       )
     )
@@ -2786,7 +2786,7 @@
   (symbol (lib_id "Device:R_Small_US") (at 236.22 142.24 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid cd09124a-d937-4c18-8e57-767843ddb45c)
-    (property "Reference" "R1" (at 236.22 146.05 90)
+    (property "Reference" "R4" (at 236.22 146.05 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "330" (at 236.22 148.59 90)
@@ -2803,7 +2803,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "R1") (unit 1)
+          (reference "R4") (unit 1)
         )
       )
     )
@@ -2812,7 +2812,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 43.18 124.46 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d28aae9c-0b3a-477b-8a39-173d17c44c9e)
-    (property "Reference" "J3" (at 48.26 123.19 90)
+    (property "Reference" "J1" (at 48.26 123.19 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Conn_01x02" (at 48.26 125.73 90)
@@ -2829,7 +2829,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "J3") (unit 1)
+          (reference "J1") (unit 1)
         )
       )
     )
@@ -2864,7 +2864,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 167.64 124.46 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid dca28966-f346-4d9f-bacb-6df6fac82036)
-    (property "Reference" "J5" (at 172.72 123.19 90)
+    (property "Reference" "J3" (at 172.72 123.19 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Conn_01x02" (at 172.72 125.73 90)
@@ -2881,7 +2881,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "J5") (unit 1)
+          (reference "J3") (unit 1)
         )
       )
     )
@@ -2890,7 +2890,7 @@
   (symbol (lib_id "Analog_Switch:CD4066BM") (at 38.1 88.9 0) (unit 5)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid de19c83c-8a1f-49ec-ae3e-0217fa7beb42)
-    (property "Reference" "U1" (at 41.91 87.63 0)
+    (property "Reference" "U2" (at 41.91 87.63 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "CD4066BM" (at 41.91 90.17 0)
@@ -2919,7 +2919,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "U1") (unit 5)
+          (reference "U2") (unit 5)
         )
       )
     )
@@ -2928,7 +2928,7 @@
   (symbol (lib_id "Analog_Switch:CD4066BM") (at 232.41 135.89 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f15ad2d7-7add-4629-b9df-1e73cbb84108)
-    (property "Reference" "U1" (at 232.41 129.54 0)
+    (property "Reference" "U2" (at 232.41 129.54 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "CD4066BM" (at 232.41 132.08 0)
@@ -2957,7 +2957,7 @@
     (instances
       (project "mxlock"
         (path "/4393a5c5-44f8-4de9-9c92-ea247f2f7df2"
-          (reference "U1") (unit 4)
+          (reference "U2") (unit 4)
         )
       )
     )
