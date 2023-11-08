@@ -1,17 +1,17 @@
 ;ATtiny214/ATtiny414/ATtiny814
 ;1  VCC
-;2  PA4 out EXTRAOUT to 4066 and EXTRALED (0=off, 1=on)
-;3  PA5 out SLOUT to 4066 (0=off, 1=on)
-;4  PA6 out CAPSOUT to 4066 (0=off, 1=on)
-;5  PA7 out 4080OUT to 4066 (0=off, 1=on)
-;6  PB3 out CBMRESETOUT (0=/CBMRESET=open, 1=/CBMRESET=low)
-;7  PB2 in 4080KEY (0=down, 1=up)
-;8  PB1 in CAPSKEY (0=down, 1=up)
-;9  PB0 in SLKEY   (0=down, 1=up)
-;10 UPDI/PA0 in EXTRAKEY (0=down, 1=up)
-;11 PA1 out SLLED   (0=on, 1=off)
-;12 PA2 out CAPSLED (0=on, 1=off)
-;13 PA3 out 4080LED (0=on, 1=off)
+;2  PA4 out LOCK3_OUT to 4066 and LED (0=off, 1=on)
+;3  PA5 out LOCK0_OUT to 4066 (0=off, 1=on)
+;4  PA6 out LOCK1_OUT to 4066 (0=off, 1=on)
+;5  PA7 out LOCK2_OUT to 4066 (0=off, 1=on)
+;6  PB3 out RESET_OUT (0=/RESET=open, 1=/RESET=low)
+;7  PB2 in /LOCK2_KEY (0=down, 1=up)
+;8  PB1 in /LOCK1_KEY (0=down, 1=up)
+;9  PB0 in /LOCK0_KEY (0=down, 1=up)
+;10 UPDI/PA0 in LOCK3_KEY (0=down, 1=up)
+;11 PA1 out /LOCK0_LED (0=on, 1=off)
+;12 PA2 out /LOCK1_LED (0=on, 1=off)
+;13 PA3 out /LOCK2_LED (0=on, 1=off)
 ;14 GND
 
     ;Definitions file will be included first by the Makefile.
@@ -23,18 +23,18 @@
 ;RAM
 current_keys     = SRAM_START+0 ;Current state of keys
 previous_keys    = SRAM_START+1 ;State of keys last time around the main loop
-shift_down_ticks = SRAM_START+2 ;Number of ticks Shift Lock has been held down
+lock0_down_ticks = SRAM_START+2 ;Number of ticks LOCK0 has been held down
 
 ;Constants
 TICK_MS         = 20    ;Milliseconds in one tick
-RESET_MS        = 50    ;Milliseconds to hold /CBMRESET low to reset
-SHIFT_DOWN_MS   = 1500  ;Milliseconds of Shift Lock held down to cause reset
+RESET_MS        = 50    ;Milliseconds to hold /RESET low to reset
+LOCK0_DOWN_MS   = 1500  ;Milliseconds of LOCK0 held down to cause reset
 
 ;Constants for bit positions used with GPIO functions
-KEY_EXTRA       = 3     ;Extra (4066 contact only)
-KEY_40_80       = 2     ;40/80 key / LED / 4066 contact
-KEY_CAPS_LOCK   = 1     ;Caps Lock key / LED / 4066 contact
-KEY_SHIFT_LOCK  = 0     ;Shift Lock key / LED / 4066 contact
+LOCK3 = 3
+LOCK2 = 2
+LOCK1 = 1
+LOCK0 = 0
 
     .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
                           ;but ASAVR treats program space as word-addressed.
@@ -78,7 +78,7 @@ reset:
     ldi r16, 0                  ;Initialize variables to defaults
     sts current_keys, r16
     sts previous_keys, r16
-    sts shift_down_ticks, r16
+    sts lock0_down_ticks, r16
 
 main_loop:
     wdr                         ;Keep watchdog happy
@@ -87,7 +87,7 @@ main_loop:
     sts current_keys, r16
 
     rcall task_keys             ;Check keys and update 4066 contacts
-    rcall task_reset            ;Reset computer if Shift Lock is held down
+    rcall task_reset            ;Reset computer if LOCK0 is held down
     rcall task_eeprom           ;Store 4066 contacts in EEPROM
     rcall task_leds             ;Update LEDs from 4066 contacts
 
@@ -107,7 +107,7 @@ main_loop:
 ;Check each key and toggle its 4066 contact if it was just pushed down.
 ;
 task_keys:
-    ldi r18, 1<<KEY_EXTRA       ;First key to check (highest bit position)
+    ldi r18, 1<<LOCK3       ;First key to check (highest bit position)
 
 1$: lds r16, current_keys
     and r16, r18                ;Leave only key of interest from current
@@ -128,47 +128,47 @@ task_keys:
 
     ret
 
-;Check for reset request and reset CBM if needed
-;If Shift Lock is held down long enough, reset the CBM, restore the
-;previous Shift Lock state, and block until Shift Lock is released.
+;Check for reset request and reset the computer if needed
+;If LOCK0 is held down long enough, reset the computer, restore the
+;previous LOCK0 state, and block until LOCK0 is released.
 ;
 task_reset:
     lds r16, current_keys
-    lds r17, shift_down_ticks
-    sbrs r16, KEY_SHIFT_LOCK    ;Skip next if Shift Lock is down
+    lds r17, lock0_down_ticks
+    sbrs r16, LOCK0             ;Skip next if LOCK0 is down
     clr r17
     cpi r17, #0xff              ;Cap tick counter (do not wrap to 0)
     breq 1$
     inc r17
-1$: sts shift_down_ticks, r17
+1$: sts lock0_down_ticks, r17
 
-    cpi r17, SHIFT_DOWN_MS/TICK_MS ;Held down long enough to reset?
+    cpi r17, LOCK0_DOWN_MS/TICK_MS ;Held down long enough to reset?
     brlo 3$
 
-    ;Shift Lock held down long enough; it's time to reset the CBM
+    ;LOCK0 held down long enough; it's time to reset the computer
 
     ;Reset count for next time
     clr r16
-    sts shift_down_ticks, r16
+    sts lock0_down_ticks, r16
 
-    ;Restore Shift Lock to its state before being pressed down
+    ;Restore LOCK0 to its state before being pressed down
     rcall gpio_read_contacts
-    ldi r17, 1<<KEY_SHIFT_LOCK
+    ldi r17, 1<<LOCK0
     eor r16, r17
     rcall gpio_write_contacts
     rcall gpio_write_leds
 
-    ;Pulse /CBMRESET low
-    rcall gpio_cbmreset_on
+    ;Pulse /RESET low
+    rcall gpio_reset_on
     ldi r16, RESET_MS
     rcall wait_n_ms
-    rcall gpio_cbmreset_off
+    rcall gpio_reset_off
 
-    ;Wait for Shift Lock to be released (prevents multiple resets)
+    ;Wait for LOCK0 to be released (prevents multiple resets)
 2$: rcall read_debounced_keys
     sts current_keys, r16
     wdr
-    sbrc r16, KEY_SHIFT_LOCK
+    sbrc r16, LOCK0
     rjmp 2$
 
 3$: ret
@@ -279,15 +279,15 @@ gpio_read_keys:
 
     lds r17, PORTA_IN
     sbrs r17, 0                 ;UPDI/PA0 clear
-    ori r16, 1<<KEY_EXTRA       ;  sets EXTRA bit
+    ori r16, 1<<LOCK3           ;  sets LOCK3 bit
 
     lds r17, PORTB_IN
     sbrs r17, 2                 ;PB2 clear
-    ori r16, 1<<KEY_40_80       ;  sets 40/80 bit
+    ori r16, 1<<LOCK2           ;  sets LOCK2 bit
     sbrs r17, 1                 ;PB1 clear
-    ori r16, 1<<KEY_CAPS_LOCK   ;  sets Caps Lock bit
+    ori r16, 1<<LOCK1           ;  sets LOCK1 bit
     sbrs r17, 0                 ;PB0 clear
-    ori r16, 1<<KEY_SHIFT_LOCK  ;  sets Shift Lock bit
+    ori r16, 1<<LOCK0           ;  sets LOCK0 bit
 
     pop r17
     ret
@@ -300,14 +300,14 @@ gpio_write_contacts:
     push r17
 
     clr r17
-    sbrc r16, KEY_EXTRA
-    ori r17, 1<<4               ;Extra bit set sets PA4
-    sbrc r16, KEY_SHIFT_LOCK    
-    ori r17, 1<<5               ;Shift Lock bit set sets PA5
-    sbrc r16, KEY_CAPS_LOCK     
-    ori r17, 1<<6               ;Caps Lock bit set sets PA6
-    sbrc r16, KEY_40_80         
-    ori r17, 1<<7               ;40/80 bit set sets PA7
+    sbrc r16, LOCK3
+    ori r17, 1<<4               ;LOCK3 bit set sets PA4
+    sbrc r16, LOCK0    
+    ori r17, 1<<5               ;LOCK0 bit set sets PA5
+    sbrc r16, LOCK1     
+    ori r17, 1<<6               ;LOCK1 bit set sets PA6
+    sbrc r16, LOCK2         
+    ori r17, 1<<7               ;LOCK2 bit set sets PA7
 
     lds r16, PORTA_OUT
     andi r16, 0xff ^ (1<<7 | 1<<6 | 1<<5 | 1<<4)
@@ -327,13 +327,13 @@ gpio_read_contacts:
 
     clr r16
     sbrc R17, 4                 
-    ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
+    ori r16, 1<<LOCK3       ;PA4 set sets LOCK3 bit
     sbrc r17, 5                 
-    ori r16, 1<<KEY_SHIFT_LOCK  ;PA5 set sets Shift Lock bit
+    ori r16, 1<<LOCK0       ;PA5 set sets LOCK0 bit
     sbrc r17, 6                 
-    ori r16, 1<<KEY_CAPS_LOCK   ;PA6 set sets Caps Lock bit
+    ori r16, 1<<LOCK1       ;PA6 set sets LOCK1 bit
     sbrc r17, 7                 
-    ori r16, 1<<KEY_40_80       ;PA7 set sets 40/80 bit
+    ori r16, 1<<LOCK2       ;PA7 set sets LOCK2 bit
 
     pop r17
     ret
@@ -346,14 +346,14 @@ gpio_write_leds:
     push r17
 
     clr r17
-    sbrs r16, KEY_SHIFT_LOCK    
-    ori r17, 1<<1               ;Shift Lock bit clear sets PA1
-    sbrs r16, KEY_CAPS_LOCK     
-    ori r17, 1<<2               ;Caps Lock bit clear sets PA2
-    sbrs r16, KEY_40_80         
-    ori r17, 1<<3               ;40/80 bit clear sets PA3
+    sbrs r16, LOCK0    
+    ori r17, 1<<1           ;LOCK0 bit clear sets PA1
+    sbrs r16, LOCK1     
+    ori r17, 1<<2           ;LOCK1 bit clear sets PA2
+    sbrs r16, LOCK2         
+    ori r17, 1<<3           ;LOCK2 bit clear sets PA3
 
-    ;Note: The LED for KEY_EXTRA is different.  It's ignored
+    ;Note: The LED for LOCK3 is different.  It's ignored
     ;here because it's on whenever its 4066 contact is on.
 
     lds r16, PORTA_OUT
@@ -375,33 +375,33 @@ gpio_read_leds:
 
     lds r17, PORTA_OUT
     sbrs r17, 1                 
-    ori r16, 1<<KEY_SHIFT_LOCK  ;PA1 clear sets Shift Lock bit
+    ori r16, 1<<LOCK0       ;PA1 clear sets LOCK0 bit
     sbrs r17, 2
-    ori r16, 1<<KEY_CAPS_LOCK   ;PA2 clear sets Caps Lock bit
+    ori r16, 1<<LOCK1       ;PA2 clear sets LOCK1 bit
     sbrs r17, 3
-    ori r16, 1<<KEY_40_80       ;PA3 clear sets 40/80 bit
+    ori r16, 1<<LOCK2       ;PA3 clear sets LOCK2 bit
 
-    ;Note: The LED for KEY_EXTRA is different.  It's on whenever
+    ;Note: The LED for LOCK3 is different.  It's on whenever
     ;its 4066 contact is on, so the 4066 contact is tested here.
 
     sbrc R17, 4
-    ori r16, 1<<KEY_EXTRA       ;PA4 set sets Extra bit
+    ori r16, 1<<LOCK3       ;PA4 set sets LOCK3 bit
 
     pop r17
     ret
 
-;Pull the /CBMRESET pin to GND, resetting the CBM computer
+;Pull the /RESET pin to GND, resetting the computer
 ;
-gpio_cbmreset_on:
+gpio_reset_on:
     ldi r16, 1<<3           ;PB3
-    sts PORTB_OUTSET, r16   ;set PB3=1 which pulls /CBMRESET low
+    sts PORTB_OUTSET, r16   ;set PB3=1 which pulls /RESET low
     ret
 
-;Open the /CBMRESET pin, allowing the CBM computer to run
+;Open the /RESET pin, allowing the computer to run
 ;
-gpio_cbmreset_off:
+gpio_reset_off:
     ldi r16, 1<<3           ;PB3
-    sts PORTB_OUTCLR, r16   ;set PB3=0 which makes /CBMRESET open
+    sts PORTB_OUTCLR, r16   ;set PB3=0 which makes /RESET open
     ret
 
 ;Set initial GPIO directions and states
@@ -409,7 +409,7 @@ gpio_cbmreset_off:
 ; - Key pins as inputs
 ; - LED pins as outputs; LEDs not lit
 ; - 4066 pins as outputs; contacts open
-; - /CBMRESET pin as output; /CBMRESET=open
+; - RESET_OUT pin as output; /RESET=open
 ;
 gpio_init:
     ;Key Inputs
@@ -442,9 +442,9 @@ gpio_init:
     sts PORTA_OUTSET, r16           ;Sets LEDs initially off (1=off)
     sts PORTA_DIRSET, r16           ;Set pins as outputs
 
-    ;/CBMRESET Output
+    ;RESET_OUT Output
     ldi r16, 1<<3                   ;PB3
-    sts PORTB_OUTCLR, r16           ;Set /CBMRESET initially high (0=high)
+    sts PORTB_OUTCLR, r16           ;Set RESET_OUT initially high (0=high)
     sts PORTB_DIRSET, r16           ;Set PB3 as output
     ret
 
