@@ -8,7 +8,7 @@
 ;7  PB2 in /LOCK2_KEY (0=down, 1=up)
 ;8  PB1 in /LOCK1_KEY (0=down, 1=up)
 ;9  PB0 in /LOCK0_KEY (0=down, 1=up)
-;10 UPDI/PA0 in LOCK3_KEY (0=down, 1=up)
+;10 UPDI/PA0 in /LOCK3_KEY (0=down, 1=up)
 ;11 PA1 out /LOCK0_LED (0=on, 1=off)
 ;12 PA2 out /LOCK1_LED (0=on, 1=off)
 ;13 PA3 out /LOCK2_LED (0=on, 1=off)
