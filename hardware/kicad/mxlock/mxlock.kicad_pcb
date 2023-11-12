@@ -104,7 +104,7 @@
   (net 26 "Net-(J1-Pin_2)")
   (net 27 "Net-(J2-Pin_1)")
   (net 28 "Net-(J2-Pin_2)")
-  (net 29 "Net-(J5-Pin_3)")
+  (net 29 "/NRESET")
   (net 30 "unconnected-(J6-TCK-Pad1)")
   (net 31 "unconnected-(J6-TMS-Pad5)")
   (net 32 "unconnected-(J6-~{SRST}-Pad6)")
@@ -478,7 +478,7 @@
     (pad "2" thru_hole roundrect (at 1.27 -1.27 270) (size 1.1 1.8) (drill 0.75 (offset 0 -0.4)) (layers "*.Cu" "*.Mask") (roundrect_rratio 0.25)
       (net 21 "Net-(Q1-B)") (pinfunction "B") (pintype "passive") (tstamp 98e5bc3d-7798-487e-9e2f-e415f90bde03))
     (pad "3" thru_hole roundrect (at 2.54 0 270) (size 1.1 1.8) (drill 0.75 (offset 0 0.4)) (layers "*.Cu" "*.Mask") (roundrect_rratio 0.25)
-      (net 29 "Net-(J5-Pin_3)") (pinfunction "C") (pintype "passive") (tstamp 0db73558-bfad-4554-95b3-1c6b685ebf9b))
+      (net 29 "/NRESET") (pinfunction "C") (pintype "passive") (tstamp 0db73558-bfad-4554-95b3-1c6b685ebf9b))
     (model "${KICAD6_3DMODEL_DIR}/Package_TO_SOT_THT.3dshapes/TO-92.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
@@ -758,7 +758,7 @@
     (pad "2" thru_hole oval (at 0 2.54 90) (size 1.7 1.7) (drill 1) (layers "*.Cu" "*.Mask")
       (net 13 "UPDI") (pinfunction "Pin_2") (pintype "passive") (tstamp dc03888d-2a9f-4d2f-998a-f93bace874df))
     (pad "3" thru_hole oval (at 0 5.08 90) (size 1.7 1.7) (drill 1) (layers "*.Cu" "*.Mask")
-      (net 29 "Net-(J5-Pin_3)") (pinfunction "Pin_3") (pintype "passive") (tstamp 59768c78-f7f4-4b88-b3ad-2dc66b1321d6))
+      (net 29 "/NRESET") (pinfunction "Pin_3") (pintype "passive") (tstamp 59768c78-f7f4-4b88-b3ad-2dc66b1321d6))
     (pad "4" thru_hole oval (at 0 7.62 90) (size 1.7 1.7) (drill 1) (layers "*.Cu" "*.Mask")
       (net 4 "GND") (pinfunction "Pin_4") (pintype "passive") (tstamp 39fc5b77-2847-47be-80cc-44da07ac9f44))
     (model "${KICAD6_3DMODEL_DIR}/Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x04_P2.54mm_Vertical.wrl"
@@ -1155,7 +1155,7 @@
     (property "Sheetname" "")
     (property "ki_description" "Quad 20V analog SPST 1:1 switch, SO-14 (3.9x8.65mm)")
     (property "ki_keywords" "analog switch selector multiplexer spst mux amux")
-    (path "/de19c83c-8a1f-49ec-ae3e-0217fa7beb42")
+    (path "/f15ad2d7-7add-4629-b9df-1e73cbb84108")
     (attr smd)
     (fp_text reference "U2" (at -4.5295 3.334 180) (layer "F.SilkS") hide
         (effects (font (size 1 1) (thickness 0.15)))
