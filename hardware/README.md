@@ -1,8 +1,20 @@
 # Hardware 
 
-The printed circuit board was designed using KiCad.  The [schematic](./schematic.pdf) and [Gerber files](./gerbers.zip) are the final version.  See [`firmware/`](../firmware) for how to program the microcontroller.
+The MXLock circuit consists of two main components: an ATtiny214/414/814 microcontroller and a 4066 analog switch.  The momentary key switches are connected directly to the microcontroller.  The 4066 is connected to the computer's keyboard matrix.
+
+Up to four locking keys can be simulated, `LOCK0` through `LOCK3`: 
+
+ - `LOCK0` can also reset the computer if held down.  The computer must have active-low reset input (`/RESET`) like on the 6502.
+ - `LOCK1` and `LOCK2` have no special characteristics.
+ - `LOCK3` has the limitation that its LED that can't be turned of programmatically unless its 4066 contact is also turned off.  If fewer than four keys are required, choose the others instead.
+
+The design files are in KiCad format.  A [PDF schematic](./schematic.pdf) and [Gerber files](./gerbers.zip) are also available.  The PCB is only for demonstration and testing purposes; the MXLock circuit is intended to be integrated onto a keyboard.
+
+See [`firmware/`](../firmware) for how to program the microcontroller.
 
 ## Parts List
+
+The demo board uses the following components:
 
 | Part | Qty | Reference Designators |
 |------|-----|-------|
