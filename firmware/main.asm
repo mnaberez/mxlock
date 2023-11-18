@@ -482,7 +482,7 @@ eeprom_read_contacts:
     ldi YH, >(EEPROM_END+1)
 1$: ld r16, -Y                          ;Load byte currently in EEPROM
     cpi r16, #0xff                      ;Erased (0xFF)?
-    brne 2$                             ;  Yes: branch to return this byte
+    brne 2$                             ;  No: branch to return this byte
     cpi YL, #<EEPROM_START
     brne 1$
     cpi YH, #>EEPROM_START
