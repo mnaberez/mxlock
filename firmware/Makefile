@@ -1,5 +1,5 @@
 PROJECT=mxlock
-MCU=t214
+MCU=t414
 ISPFLAGS=-c atmelice_updi
 
 PROJECT_FLASH  = $(PROJECT)_$(MCU)_flash
