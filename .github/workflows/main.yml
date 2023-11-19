@@ -20,7 +20,9 @@ jobs:
         echo "$PWD/asxv5pxx/asxmak/linux/build" >> $GITHUB_PATH
 
     - name: Install srecord
-      run: sudo apt-get install srecord
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y srecord
 
     - name: Build the firmware (${{ matrix.mcu }} version)
       run: |
