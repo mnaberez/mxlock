@@ -1,10 +1,10 @@
 ;ATtiny214/ATtiny414/ATtiny814
 ;1  VCC
-;2  PA4 out LOCK3_OUT to 4066 and LED (0=off, 1=on)
+;2  PA4 out RESET_OUT (0=/RESET=open, 1=/RESET=low)
 ;3  PA5 out LOCK0_OUT to 4066 (0=off, 1=on)
 ;4  PA6 out LOCK1_OUT to 4066 (0=off, 1=on)
 ;5  PA7 out LOCK2_OUT to 4066 (0=off, 1=on)
-;6  PB3 out RESET_OUT (0=/RESET=open, 1=/RESET=low)
+;6  PB3 out LOCK3_OUT to 4066 and LED (0=off, 1=on)
 ;7  PB2 in /LOCK2_KEY (0=down, 1=up)
 ;8  PB1 in /LOCK1_KEY (0=down, 1=up)
 ;9  PB0 in /LOCK0_KEY (0=down, 1=up)
@@ -260,7 +260,7 @@ jmp_fatal:
 
 ;
 ;The GPIO routines abstract the I/O pins such that the bit
-;positions in the KEY_* constants are used for all the 
+;positions in the constants LOCK0-LOCK3 are used for all the 
 ;routines (the key inputs, LED outputs, and 4066 contacts).
 ;
 ;The bit values use positive logic:
@@ -296,26 +296,25 @@ gpio_read_keys:
 ;0=contact open, 1=contact closed
 ;
 gpio_write_contacts:
-    push r16
     push r17
 
-    clr r17
-    sbrc r16, LOCK3
-    ori r17, 1<<4               ;LOCK3 bit set sets PA4
+    lds r17, PORTA_OUT
+    andi r17, 0xff ^ (1<<7 | 1<<6 | 1<<5)
     sbrc r16, LOCK0    
-    ori r17, 1<<5               ;LOCK0 bit set sets PA5
+    ori r17, 1<<5           ;LOCK0 bit set sets PA5
     sbrc r16, LOCK1     
-    ori r17, 1<<6               ;LOCK1 bit set sets PA6
+    ori r17, 1<<6           ;LOCK1 bit set sets PA6
     sbrc r16, LOCK2         
-    ori r17, 1<<7               ;LOCK2 bit set sets PA7
+    ori r17, 1<<7           ;LOCK2 bit set sets PA7
+    sts PORTA_OUT, r17
 
-    lds r16, PORTA_OUT
-    andi r16, 0xff ^ (1<<7 | 1<<6 | 1<<5 | 1<<4)
-    or r16, r17
-    sts PORTA_OUT, r16
+    lds r17, PORTB_OUT
+    andi r17, 0xff ^ (1<<3)
+    sbrc r16, LOCK3
+    ori r17, 1<<3           ;LOCK3 bit set sets PB3
+    sts PORTB_OUT, r17
 
     pop r17
-    pop r16
     ret
 
 ;Read the state of all the 4066 contacts into R16
@@ -323,17 +322,20 @@ gpio_write_contacts:
 ;
 gpio_read_contacts:
     push r17
-    lds r17, PORTA_OUT
 
     clr r16
-    sbrc R17, 4                 
-    ori r16, 1<<LOCK3       ;PA4 set sets LOCK3 bit
+
+    lds r17, PORTA_OUT
     sbrc r17, 5                 
     ori r16, 1<<LOCK0       ;PA5 set sets LOCK0 bit
     sbrc r17, 6                 
     ori r16, 1<<LOCK1       ;PA6 set sets LOCK1 bit
     sbrc r17, 7                 
     ori r16, 1<<LOCK2       ;PA7 set sets LOCK2 bit
+
+    lds r17, PORTB_OUT
+    sbrc r17, 3
+    ori r16, 1<<LOCK3       ;PB3 set sets LOCK3 bit
 
     pop r17
     ret
@@ -342,27 +344,22 @@ gpio_read_contacts:
 ;0=LED off, 1=LED on
 ;
 gpio_write_leds:
-    push r16 
     push r17
 
-    clr r17
+    lds r17, PORTA_OUT
+    andi r17, 0xff ^ (1<<3 | 1<<2 | 1<<1)    
     sbrs r16, LOCK0    
     ori r17, 1<<1           ;LOCK0 bit clear sets PA1
     sbrs r16, LOCK1     
     ori r17, 1<<2           ;LOCK1 bit clear sets PA2
     sbrs r16, LOCK2         
     ori r17, 1<<3           ;LOCK2 bit clear sets PA3
+    sts PORTA_OUT, r17
 
     ;Note: The LED for LOCK3 is different.  It's ignored
     ;here because it's on whenever its 4066 contact is on.
 
-    lds r16, PORTA_OUT
-    andi r16, 0xff ^ (1<<3 | 1<<2 | 1<<1)    
-    or r16, r17
-    sts PORTA_OUT, r16
-
     pop r17
-    pop r16
     ret
 
 ;Read the state of all the LED outputs into R16
@@ -384,8 +381,9 @@ gpio_read_leds:
     ;Note: The LED for LOCK3 is different.  It's on whenever
     ;its 4066 contact is on, so the 4066 contact is tested here.
 
-    sbrc R17, 4
-    ori r16, 1<<LOCK3       ;PA4 set sets LOCK3 bit
+    lds r17, PORTB_OUT
+    sbrc r17, 3
+    ori r16, 1<<LOCK3       ;PB3 set sets LOCK3 bit
 
     pop r17
     ret
@@ -393,15 +391,15 @@ gpio_read_leds:
 ;Pull the /RESET pin to GND, resetting the computer
 ;
 gpio_reset_on:
-    ldi r16, 1<<3           ;PB3
-    sts PORTB_OUTSET, r16   ;set PB3=1 which pulls /RESET low
+    ldi r16, 1<<4           ;PA4
+    sts PORTA_OUTSET, r16   ;set PA4=1 which pulls /RESET low
     ret
 
 ;Open the /RESET pin, allowing the computer to run
 ;
 gpio_reset_off:
-    ldi r16, 1<<3           ;PB3
-    sts PORTB_OUTCLR, r16   ;set PB3=0 which makes /RESET open
+    ldi r16, 1<<4           ;PA4
+    sts PORTA_OUTCLR, r16   ;set PA4=0 which makes /RESET open
     ret
 
 ;Set initial GPIO directions and states
@@ -433,9 +431,12 @@ gpio_init:
     ;is configured because UPDI mode has its own special pull-up.
 
     ;4066 Outputs
-    ldi r16, 1<<7 | 1<<6 | 1<<5 | 1<<4  ;PA7, PA6, PA5, PA4
+    ldi r16, 1<<7 | 1<<6 | 1<<5     ;PA7, PA6, PA5
     sts PORTA_OUTCLR, r16           ;Set 4066s initially off (0=off)
     sts PORTA_DIRSET, r16           ;Set pins as outputs
+    ldi r16, 1<<3                   ;PB3
+    sts PORTB_OUTCLR, r16           ;Set 4066s initially off (0=off)
+    sts PORTB_DIRSET, r16           ;Set pins as outputs
 
     ;LED Outputs
     ldi r16, 1<<3 | 1<<2 | 1<<1     ;PA3, PA2, PA1
@@ -443,9 +444,9 @@ gpio_init:
     sts PORTA_DIRSET, r16           ;Set pins as outputs
 
     ;RESET_OUT Output
-    ldi r16, 1<<3                   ;PB3
-    sts PORTB_OUTCLR, r16           ;Set RESET_OUT initially high (0=high)
-    sts PORTB_DIRSET, r16           ;Set PB3 as output
+    ldi r16, 1<<4                   ;PA4
+    sts PORTA_OUTCLR, r16           ;Set RESET_OUT initially off (0=off)
+    sts PORTA_DIRSET, r16           ;Set PA4 as output
     ret
 
 ;EEPROM =====================================================================
