@@ -6,7 +6,7 @@ Up to four locking keys can be simulated, `LOCK0` through `LOCK3`:
 
  - `LOCK0` can also reset the computer if held down.  The computer must have active-low reset input (`/RESET`) like on the 6502.
  - `LOCK1` and `LOCK2` have no special characteristics.
- - `LOCK3` has the limitation that its LED that can't be turned of programmatically unless its 4066 contact is also turned off.  If fewer than four keys are required, choose the others instead.
+ - `LOCK3` has the limitation that its LED that can't be turned off programmatically unless its 4066 contact is also turned off.  If fewer than four keys are required, choose the others instead.
 
 The design files are in KiCad format.  A [PDF schematic](./schematic.pdf) and [Gerber files](./gerbers.zip) are also available.  The PCB is only for demonstration and testing purposes; the MXLock circuit is intended to be integrated onto a keyboard.
 
