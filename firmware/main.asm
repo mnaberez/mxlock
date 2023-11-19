@@ -278,16 +278,16 @@ gpio_read_keys:
     clr r16
 
     lds r17, PORTA_IN
-    sbrs r17, 0                 ;UPDI/PA0 clear
-    ori r16, 1<<LOCK3           ;  sets LOCK3 bit
+    sbrs r17, 0             ;UPDI/PA0 clear
+    ori r16, 1<<LOCK3       ;  sets LOCK3 bit
 
     lds r17, PORTB_IN
-    sbrs r17, 2                 ;PB2 clear
-    ori r16, 1<<LOCK2           ;  sets LOCK2 bit
-    sbrs r17, 1                 ;PB1 clear
-    ori r16, 1<<LOCK1           ;  sets LOCK1 bit
-    sbrs r17, 0                 ;PB0 clear
-    ori r16, 1<<LOCK0           ;  sets LOCK0 bit
+    sbrs r17, 2             ;PB2 clear
+    ori r16, 1<<LOCK2       ;  sets LOCK2 bit
+    sbrs r17, 1             ;PB1 clear
+    ori r16, 1<<LOCK1       ;  sets LOCK1 bit
+    sbrs r17, 0             ;PB0 clear
+    ori r16, 1<<LOCK0       ;  sets LOCK0 bit
 
     pop r17
     ret
