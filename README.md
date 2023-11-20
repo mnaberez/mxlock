@@ -23,6 +23,16 @@ The circuit is intended to be integrated directly onto the PCB of a keyboard.  S
 
 The firmware is written in AVR assembly language.  It can be assembled and flashed using open source software and inexpensive hardware.  See [`firmware/`](./firmware/) for the source code and instructions.
 
+## Other Circuits
+
+A circuit to simulate locking keys with momentary ones is not a new idea.  Here are some others:
+
+ - [Johan Grip](https://github.com/jgrip/c128-keyboard) uses three [MAX16054](https://web.archive.org/web/20231025162549if_/https://www.analog.com/media/en/technical-documentation/data-sheets/MAX16054.pdf)s and a [74AUC1G66](https://web.archive.org/web/20220804180205if_/https://www.ti.com/lit/ds/symlink/sn74auc1g66.pdf) for the `CAPS LOCK`, `SHIFT LOCK`, and `40/80` keys on the C128.
+
+ - [MtnBuffalo](https://www.breadbox64.com/blog/the-mechboard64/) uses a [555](https://web.archive.org/web/20231103200645if_/https://www.ti.com/lit/ds/symlink/lm555.pdf) and a [4066](https://web.archive.org/web/20231029180910if_/https://www.ti.com/lit/ds/symlink/cd4066b-mil.pdf) for the `SHIFT LOCK` key on the C64.
+
+MXLock differentiates itself by its low parts count (two chips for four keys) and its ability to remember the lock states between power cycles.
+
 ## Author
 
 [Mike Naberezny](https://github.com/mnaberez)
