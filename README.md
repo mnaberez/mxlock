@@ -4,7 +4,7 @@
 
 MXLock is a two-chip circuit that allows up to four mechanically locking keys (push-on, push-off) to be simulated using regular momentary key switches.
 
-Many older computer keyboards have mechanically locking keys.  For example, the Commodore 128 has three locking keys: `SHIFT LOCK`, `CAPS LOCK`, and `40/80`.  This is a problem for replacement keyboard projects such as those using Cherry MX key switches because locking key switches are difficult to find and expensive.  By using the MXLock circuit, the entire keyboard can be made from regular momentary key switches.
+Many older computer keyboards have mechanically locking keys.  For example, the Commodore 128 has three locking keys: `SHIFT LOCK`, `CAPS LOCK`, and `40/80`.  The MXLock circuit can be included on the PCB of replacement keyboard projects, such as those using Cherry MX keys, so that the entire keyboard can be made from momentary key switches.
 
 Features:
 
