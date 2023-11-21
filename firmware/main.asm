@@ -49,6 +49,13 @@ LOCK0 = 0
     .assume . - ((PROGMEM_START/2) + INT_VECTORS_SIZE)
 
 reset:
+    ;Set main clock to 16 MHz to get through init quickly
+    ;in case the computer checks for a key at boot.
+    ldi r16, CPU_CCP_IOREG_gc
+    clr r17                             ;No prescaler = 16 MHz
+    out CPU_CCP, r16                    ;Unlock Protected I/O Registers
+    sts CLKCTRL_MCLKCTRLB, r17          ;Disable main clock prescaler
+
     ;Clear RAM
     ldi ZL, <INTERNAL_SRAM_START
     ldi ZH, >INTERNAL_SRAM_START
@@ -75,7 +82,15 @@ reset:
     rcall eeprom_read_contacts  ;Read 4066 contacts saved in EEPROM
     rcall gpio_write_contacts   ;  and restore the 4066 to that state
 
-    ldi r16, 0                  ;Initialize variables to defaults
+    ;Now that the 4066 is set up, drop down to 1 MHz.  The clock
+    ;will run at 1 MHz from now on to save a little power.
+    ldi r16, CPU_CCP_IOREG_gc
+    ldi r17, 0x03<<1 | CLKCTRL_PEN_bm   ;Prescaler for 1 MHz
+    out CPU_CCP, r16                    ;Unlock Protected I/O Registers
+    sts CLKCTRL_MCLKCTRLB, r17          ;Set main clock prescaler
+
+    ;Initialize variables to defaults
+    clr r16
     sts current_keys, r16
     sts previous_keys, r16
     sts lock0_down_ticks, r16
@@ -107,7 +122,7 @@ main_loop:
 ;Check each key and toggle its 4066 contact if it was just pushed down.
 ;
 task_keys:
-    ldi r18, 1<<LOCK3       ;First key to check (highest bit position)
+    ldi r18, 1<<LOCK3           ;First key to check (highest bit position)
 
 1$: lds r16, current_keys
     and r16, r18                ;Leave only key of interest from current
@@ -237,16 +252,19 @@ wait_n_ms:
     ret
 
 ;Busy wait for 1 millisecond
+;Assumes 1 MHz clock
 ;
 wait_1_ms:
     push r16
     push r17
-    ldi r16, 0x05
-1$: ldi r17, 0xde
+
+    ldi r16, 0x02
+1$: ldi r17, 0xa6
 2$: dec r17
     brne 2$
     dec r16
     brne 1$
+
     pop r17
     pop r16
     ret
@@ -488,7 +506,7 @@ eeprom_read_contacts:
     brne 1$
     cpi YH, #>EEPROM_START
     brne 1$
-    ldi r16, 0                          ;EEPROM is empty; return 0 (all off)
+    clr r16                             ;EEPROM is empty; return 0 (all off)
 2$: ret
 
 ;Store R16 as the 4066 contact state in the EEPROM

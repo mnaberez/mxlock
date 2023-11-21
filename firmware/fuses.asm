@@ -13,7 +13,7 @@
 
 ;Oscillator Configuration
 .org 0+FUSE_OSCCFG_offset
-.byte (0<<FUSE_OSCLOCK_bp) | FUSE_FREQSEL_20MHZ_gc
+.byte (0<<FUSE_OSCLOCK_bp) | FUSE_FREQSEL_16MHZ_gc
 
 ;Reserved fuse between OSCCFG and TCD0CFG should not be programmed
 
