@@ -1,3 +1,5 @@
+_autosave*
+*auto_saved_files*
 mxlock-backups/
 gerbers/
 *-lib-table
