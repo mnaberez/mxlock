@@ -56,20 +56,6 @@ reset:
     out CPU_CCP, r16                    ;Unlock Protected I/O Registers
     sts CLKCTRL_MCLKCTRLB, r17          ;Disable main clock prescaler
 
-    ;Clear RAM
-    ldi ZL, <INTERNAL_SRAM_START
-    ldi ZH, >INTERNAL_SRAM_START
-    clr r16
-1$: st Z, r16                 ;Store 0 at Z
-    ld r16, Z+                ;Read it back, increment Z
-    tst r16                   ;Did it read back as 0?
-    breq 2$                   ;Yes: continue clearing
-    jmp fatal                 ;No: hardware failure, jump to fatal
-2$: cpi ZL, <(INTERNAL_SRAM_END+1)
-    brne 1$
-    cpi ZH, >(INTERNAL_SRAM_END+1)
-    brne 1$
-
     ;Initialize stack pointer
     ldi r16, <INTERNAL_SRAM_END
     out CPU_SPL, r16
