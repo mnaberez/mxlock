@@ -10,7 +10,7 @@ jobs:
         mcu: ["t214", "t414", "t814"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install asxxxx
       run: |
@@ -27,7 +27,7 @@ jobs:
         cat firmware/mxlock_${{ matrix.mcu }}_eeprom.lst
 
     - name: 'Upload build artifacts'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts-${{ matrix.mcu }}
         path: |
