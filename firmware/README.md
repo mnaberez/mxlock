@@ -7,7 +7,6 @@ The firmware is written in AVR assembly language.  It can be built for the ATtin
 Building requires:
 
 - ASAVR (part of the [ASxxxx](https://shop-pdp.net/ashtml/) cross-assemblers package)
-- [SRecord](http://srecord.sourceforge.net/) version 1.64 or later
 - GNU [Make](https://www.gnu.org/software/make/)
 - A Unix-like operating system (e.g. Linux, macOS)
 

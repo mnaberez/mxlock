@@ -587,8 +587,7 @@ fatal:
     out CPU_CCP, r16          ;Unlock Protected I/O Registers
     sts RSTCTRL_SWRR, r17     ;Software Reset
 
-fatal_size = . - fatal
+fatal_size = . - 1 - fatal
 
-;Last program word (last 2 bytes) will be the CRC16 added by the Makefile
-crc16:
-    .assume . - (PROGMEM_END/2)
+;Entire flash memory should be filled
+    .assume . - (PROGMEM_SIZE/2)
