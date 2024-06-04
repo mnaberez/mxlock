@@ -38,16 +38,61 @@ LOCK0 = 0
 
     .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
                           ;but ASAVR treats program space as word-addressed.
-    rjmp reset
 
-    ;All interrupt vectors jump to fatal error (interrupts are not used)
-    .rept INT_VECTORS_SIZE - 1
-    rjmp jmp_fatal
-    .endm
+    ;Vectors
+    rjmp reset            ;00 RESET
+    rjmp isr_fatal        ;01 CRCSCAN_NMI
+    rjmp isr_fatal        ;02 BOD_VLM
+    rjmp isr_pin_change   ;03 PORTA_PORT
+    rjmp isr_pin_change   ;04 PORTB_PORT
+    rjmp isr_fatal        ;05 Undefined
+    rjmp isr_fatal        ;06 RTC_CNT
+    rjmp isr_fatal        ;07 RTC_PIT
+    rjmp isr_fatal        ;08 TCA0_LUNF / TCA0_OVF
+    rjmp isr_fatal        ;09 TCA0_HUNF
+    rjmp isr_fatal        ;0a TCA0_LCMP0 / TCA0_CMP0
+    rjmp isr_fatal        ;0b TCA0_LCMP1 / TCA0_CMP1
+    rjmp isr_fatal        ;0c TCA0_CMP2 / TCA0_LCMP2
+    rjmp isr_fatal        ;0d TCB0_INT
+    rjmp isr_fatal        ;0e TCD0_OVF
+    rjmp isr_fatal        ;0f TCD0_TRIG
+    rjmp isr_fatal        ;10 AC0_AC
+    rjmp isr_fatal        ;11 ACD0_RESRDY
+    rjmp isr_fatal        ;12 ACD0_WCOMP
+    rjmp isr_fatal        ;13 TWI0_TWIS
+    rjmp isr_fatal        ;14 TWI0_TWIM
+    rjmp isr_fatal        ;15 SPI0_INT
+    rjmp isr_fatal        ;16 USART0_RXC
+    rjmp isr_fatal        ;17 USART0_DRE
+    rjmp isr_fatal        ;18 USART0_TXC
+    rjmp isr_fatal        ;19 NVMCTRL_EE
 
     ;Code starts at first location after vectors
     .assume . - ((PROGMEM_START/2) + INT_VECTORS_SIZE)
 
+;Unexpected interrupt
+;
+isr_fatal:
+    jmp fatal
+
+;Pin change interrupt
+;
+;The pin change interrupts are enabled in order to wake
+;from sleep but are not used for anything else.  When a
+;pin change interrupt occurs, its flags must be cleared.
+;
+isr_pin_change:
+    push r16
+    ldi r16, 0xff                       ;Clear every flag
+    sts PORTA_INTFLAGS, r16             ;  on PORTA
+    sts PORTB_INTFLAGS, r16             ;  on PORTB
+    pop r16
+    reti
+
+;Reset
+;
+;Perform all startup activities, then start running the main loop.
+;
 reset:
     ;Set main clock to 16 MHz to get through init quickly
     ;in case the computer checks for a key at boot.
@@ -62,11 +107,10 @@ reset:
     ldi r16, >INTERNAL_SRAM_END
     out CPU_SPH, r16
 
-    rcall wdog_init
+    ;Initialize GPIO and restore 4066 contacts to last saved state
     rcall gpio_init
-
-    rcall eeprom_read_contacts  ;Read 4066 contacts saved in EEPROM
-    rcall gpio_write_contacts   ;  and restore the 4066 to that state
+    rcall eeprom_read_contacts  
+    rcall gpio_write_contacts   
 
     ;Now that the 4066 is set up, drop down to 1 MHz.  The clock
     ;will run at 1 MHz from now on to save a little power.
@@ -81,9 +125,13 @@ reset:
     sts previous_keys, r16
     sts lock0_down_ticks, r16
 
-main_loop:
-    wdr                         ;Keep watchdog happy
+    ;Initialize remaining peripherals and enable interrupts
+    rcall sleep_init
+    sei
 
+    ;Fall through
+
+main_loop:
     rcall read_debounced_keys   ;Read keys (delays 1 tick to debounce)
     sts current_keys, r16
 
@@ -91,7 +139,8 @@ main_loop:
     rcall task_reset            ;Reset computer if LOCK0 is held down
     rcall task_eeprom           ;Store 4066 contacts in EEPROM
     rcall task_leds             ;Update LEDs from 4066 contacts
-
+    rcall task_sleep            ;Go to sleep until a key changes
+ 
     lds r16, current_keys       
     sts previous_keys, r16      ;Save keys for next time around
 
@@ -200,12 +249,30 @@ task_eeprom:
 1$: ret
 
 ;Update the LEDs from the 4066 contacts
-;This task should be called last in the main loop because other
-;tasks may temporarily change the state of the LEDs.
+;
+;This task should be called before the sleep task to ensure 
+;the LEDs reflect the 4066 contacts because other tasks may 
+;temporarily change the LEDs.
 ;
 task_leds:
     rcall gpio_read_contacts    
     rjmp gpio_write_leds        
+
+;Go to sleep until a key changes
+;
+;This task should always be the last one called.  It puts
+;the MCU to sleep until a key is pressed in order to save
+;power.  If this task is removed from the main loop, all
+;other tasks will continue to work the same.
+;
+task_sleep:
+    lds r16, current_keys
+    or r16, r16
+    brne 1$                     ;Do nothing if any key is down
+
+    sleep                       ;Returns when MCU wakes back up
+
+1$: ret
 
 ;UTILITIES ==================================================================
 
@@ -254,11 +321,6 @@ wait_1_ms:
     pop r17
     pop r16
     ret
-
-;Work around RJMP range limitation
-;
-jmp_fatal:
-    jmp fatal
 
 ;GPIO =======================================================================
 
@@ -418,7 +480,8 @@ gpio_init:
     ldi r16, 1<<2 | 1<<1 | 1<<0     ;PB2, PB1, PB0
     sts PORTB_DIRCLR, r16           ;Set pins as input
 
-    ldi r16, PORT_PULLUPEN_bm       ;Pull-up enabled, other features disabled
+    ;Enable pull-ups and pin-change interrupts
+    ldi r16, PORT_PULLUPEN_bm | PORT_ISC_BOTHEDGES_gc
     sts PORTB_PIN2CTRL, r16         ; on PB2
     sts PORTB_PIN1CTRL, r16         ; on PB1
     sts PORTB_PIN0CTRL, r16         ; on PB0
@@ -426,8 +489,8 @@ gpio_init:
     ;UPDI/PA0 Key Input
     ldi r16, 1<<0                   ;UPDI/PA0
     sts PORTA_DIRCLR, r16           ;Set UPDI pin also as a GPIO input
-    clr r16
-    sts PORTA_PIN0CTRL, r16         ;No pull-up or other features on PA0
+    ldi r16, PORT_ISC_BOTHEDGES_gc
+    sts PORTA_PIN0CTRL, r16         ;Enable pin change interrupt on PA0
 
     ;Note: The UPDI/PA0 pin is configured for UPDI in the fuses.  In UPDI
     ;mode, the pin can still be used as an input.  The MCU can still be
@@ -451,6 +514,13 @@ gpio_init:
     ldi r16, 1<<4                   ;PA4
     sts PORTA_OUTCLR, r16           ;Set RESET_OUT initially off (0=off)
     sts PORTA_DIRSET, r16           ;Set PA4 as output
+    ret
+
+;SLEEP ======================================================================
+
+sleep_init:
+    ldi r16, SLPCTRL_SEN_bm | SLPCTRL_SMODE_PDOWN_gc
+    sts SLPCTRL_CTRLA, r16
     ret
 
 ;EEPROM =====================================================================
@@ -547,27 +617,6 @@ eeprom_wait_ready:
     lds r17, NVMCTRL_STATUS
     sbrc r17, NVMCTRL_EEBUSY_bp         ;Skip next if EEPROM is ready
     rjmp eeprom_wait_ready
-    ret
-
-;WATCHDOG ===================================================================
-
-;Ensure the watchdog was started by the fuses and reset the timer.
-;The WDR instruction must be executed at least once every 4 seconds
-;or the watchdog will reset the system.
-wdog_init:
-    ;Ensure watchdog period has been configured
-    lds r16, WDT_CTRLA
-    andi r16, WDT_PERIOD_gm
-    cpi r16, WDT_PERIOD_4KCLK_gc      ;Watchdog period set by the fuses?
-    breq 1$                           ;Yes: continue
-    jmp fatal                         ;No: bad fuses, jump to fatal
-
-    ;Ensure watchdog is locked so it can't be stopped
-1$: lds r16, WDT_STATUS
-    sbrs r16, WDT_LOCK_bp             ;Skip fatal if locked
-    jmp fatal
-
-    wdr                               ;Reset watchdog timer
     ret
 
 ;END OF CODE ================================================================

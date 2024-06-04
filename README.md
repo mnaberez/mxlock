@@ -11,7 +11,8 @@ Features:
  - Simulates up to 4 locking keys using an [ATtiny214/414/814](https://web.archive.org/web/20231029180615if_/https://ww1.microchip.com/downloads/en/DeviceDoc/40001912A.pdf) and a [4066](https://web.archive.org/web/20231029180910if_/https://www.ti.com/lit/ds/symlink/cd4066b-mil.pdf)
  - Shows the on/off state of each key with LEDs
  - Remembers the lock states between power cycles (useful for mode keys like `40/80`)
- - Resets the computer by pulling `/RESET` low if a key is held down
+ - Resets the computer by pulling `/RESET` low if the `LOCK0` key is held down
+ - Puts the ATtiny to sleep between keypresses to save power
 
 ## Hardware
 

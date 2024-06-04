@@ -5,11 +5,11 @@
 
 ;Watchdog Configuration
 .org 0+FUSE_WDTCFG_offset
-.byte FUSE_WINDOW_OFF_gc | FUSE_PERIOD_4KCLK_gc
+.byte 0
 
 ;BOD Configuration
 .org 0+FUSE_BODCFG_offset
-.byte BOD_LVL_BODLEVEL7_gc | BOD_SAMPFREQ_1KHZ_gc | BOD_ACTIVE_ENABLED_gc | BOD_SLEEP_DIS_gc
+.byte 0
 
 ;Oscillator Configuration
 .org 0+FUSE_OSCCFG_offset
@@ -23,7 +23,7 @@
 
 ;System Configuration 0
 .org 0+FUSE_SYSCFG0_offset
-.byte FUSE_CRCSRC_NOCRC_gc | FUSE_RSTPINCFG_UPDI_gc | (0<<FUSE_EESAVE_bp)
+.byte FUSE_RSTPINCFG_UPDI_gc | (0<<FUSE_EESAVE_bp)
 
 ;System Configuration 1
 .org 0+FUSE_SYSCFG1_offset
