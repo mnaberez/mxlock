@@ -23,7 +23,7 @@
 
 ;System Configuration 0
 .org 0+FUSE_SYSCFG0_offset
-.byte FUSE_RSTPINCFG_UPDI_gc | (0<<FUSE_EESAVE_bp)
+.byte FUSE_CRCSRC_NOCRC_gc | FUSE_RSTPINCFG_UPDI_gc | (0<<FUSE_EESAVE_bp)
 
 ;System Configuration 1
 .org 0+FUSE_SYSCFG1_offset
