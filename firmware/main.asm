@@ -132,31 +132,32 @@ reset:
     ;Fall through
 
 main_loop:
-    rcall read_debounced_keys   ;Read keys (delays 1 tick to debounce)
-    sts current_keys, r16
-
-    rcall task_keys             ;Check keys and update 4066 contacts
+    rcall task_keys             ;Read key state, remember previous state
+    rcall task_contacts         ;Flip 4066 contact for any key just pressed
     rcall task_reset            ;Reset computer if LOCK0 is held down
     rcall task_eeprom           ;Store 4066 contacts in EEPROM
     rcall task_leds             ;Update LEDs from 4066 contacts
     rcall task_sleep            ;Go to sleep until a key changes
- 
-    lds r16, current_keys       
-    sts previous_keys, r16      ;Save keys for next time around
 
     rjmp main_loop              ;Loop forever
 
 ;TASKS ======================================================================
 
-;
-;The main loop calls all of these tasks each time around.  There is a 
-;delay of 1 tick between each iteration of the main loop, which these
-;tasks can use for timing.
-;
-
-;Check each key and toggle its 4066 contact if it was just pushed down.
+;Read the current state of the keys and remember the previous state.
+;This task blocks for 1 tick to debounce.
 ;
 task_keys:
+    lds r16, current_keys       
+    sts previous_keys, r16      ;Save keys from last time called
+
+    rcall read_debounced_keys   ;Read keys (blocks for 1 tick)
+    sts current_keys, r16       ;Save current keys
+
+    ret
+
+;Check each key and toggle its 4066 contact if it was just pressed down.
+;
+task_contacts:
     ldi r18, 1<<LOCK3           ;First key to check (highest bit position)
 
 1$: lds r16, current_keys
@@ -260,10 +261,8 @@ task_leds:
 
 ;Go to sleep until a key changes
 ;
-;This task should always be the last one called.  It puts
-;the MCU to sleep until a key is pressed in order to save
-;power.  If this task is removed from the main loop, all
-;other tasks will continue to work the same.
+;This task should always be the last one called.  It puts the
+;MCU to sleep until a key is pressed in order to save power.
 ;
 task_sleep:
     lds r16, current_keys
