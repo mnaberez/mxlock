@@ -4,13 +4,13 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         mcu: ["t214", "t414", "t814"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install asxxxx
       run: |
@@ -27,7 +27,7 @@ jobs:
         cat firmware/mxlock_${{ matrix.mcu }}_eeprom.lst
 
     - name: 'Upload build artifacts'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: build-artifacts-${{ matrix.mcu }}
         path: |
